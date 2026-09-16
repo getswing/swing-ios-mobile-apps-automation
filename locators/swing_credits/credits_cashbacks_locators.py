@@ -1,0 +1,12 @@
+class CreditsCashbacksLocators:
+    EL_HEADER = '//XCUIElementTypeOther[@name="Swing Credits cashbacks"]'
+    BTN_BACK = '//XCUIElementTypeOther[@name="Swing Credits cashbacks"]/preceding-sibling::XCUIElementTypeButton[1]'
+    EL_SEARCH = '//XCUIElementTypeOther[@name="Search here..."]'
+    INPUT_SEARCH = '//XCUIElementTypeOther[@name="Search here..."]/following-sibling::XCUIElementTypeTextField'
+    EL_TAB_ALL = '//XCUIElementTypeOther[contains(@name,"All")]'
+    IMG_TAB_BY_NAME = '//XCUIElementTypeImage[contains(@name,"{}")]'
+    TXT_COLUMN_REGULAR = '//XCUIElementTypeStaticText[starts-with(@name,"Regular Swing")]'
+    TXT_COLUMN_SWING_PASS = '//XCUIElementTypeStaticText[starts-with(@name,"Swing Pass")]'
+    TXT_VENUE_BY_NAME = '//XCUIElementTypeStaticText[@name="{}"]'
+    TXT_CASHBACK_RATE = '//XCUIElementTypeStaticText[@name="{}"]'
+    LIST_CASHBACK_LABELS = '//XCUIElementTypeStaticText[@name="cashback"]'

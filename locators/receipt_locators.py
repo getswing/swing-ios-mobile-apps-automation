@@ -1,0 +1,11 @@
+class ReceiptLocators:
+    EL_TITLE = '//XCUIElementTypeOther[starts-with(@name,"Receipt #")]'
+    BTN_BACK = '//XCUIElementTypeOther[starts-with(@name,"Receipt #")]/preceding-sibling::XCUIElementTypeButton[1]'
+    TXT_VENUE = '//XCUIElementTypeStaticText[contains(@name,"Driving Range")]'
+    TXT_RESCHEDULE_ID = '//XCUIElementTypeStaticText[starts-with(@name,"Reschedule #")]'
+    TXT_BOOKING_ID = '//XCUIElementTypeStaticText[starts-with(@name,"#")]'
+    TXT_FIELD = '//XCUIElementTypeStaticText[@name="{}"]'
+    TXT_PAYMENT_METHOD = '//XCUIElementTypeStaticText[@name="Payment method"]'
+    BTN_SEE_RESCHEDULE_DETAILS = '//XCUIElementTypeButton[@name="See reschedule details"]'
+    EL_CONTACT_SUPPORT = '//XCUIElementTypeOther[@name="Contact Swing support"]'
+    BTN_SEND_RECEIPT = '//XCUIElementTypeButton[@name="Send receipt"]'

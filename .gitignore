@@ -1,0 +1,11 @@
+.env
+.env.*
+__pycache__
+.claude
+.my-env
+.pytest_cache
+.vscode
+artifacts/*
+reports
+
+.DS_Store

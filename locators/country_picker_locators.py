@@ -1,0 +1,10 @@
+class CountryPickerLocators:
+    TXT_TITLE = '//XCUIElementTypeStaticText[@name="Select country code"]'
+    BTN_BACK = '//XCUIElementTypeStaticText[@name="Select country code"]/preceding-sibling::XCUIElementTypeButton[1]'
+    EL_SEARCH_BAR = '//XCUIElementTypeOther[@name="Search country code"]'
+    INPUT_SEARCH = '//XCUIElementTypeOther[@name="Search country code"]/following-sibling::XCUIElementTypeTextField[1]'
+    LIST_COUNTRIES = '//XCUIElementTypeScrollView'
+    LIST_COUNTRY_ROWS = '//XCUIElementTypeStaticText[starts-with(@name,"+")]'
+    TXT_COUNTRY = '//XCUIElementTypeStaticText[@name="{}"]'
+    TXT_COUNTRY_CONTAINS = '//XCUIElementTypeStaticText[starts-with(@name,"+") and contains(@name,"{}")]'
+    TXT_COUNTRY_BY_INDEX = '(//XCUIElementTypeStaticText[starts-with(@name,"+")])[{}]'

@@ -1,0 +1,10 @@
+class CancellationSuccessLocators:
+    TXT_TITLE = '//XCUIElementTypeStaticText[starts-with(@name,"Booking cancelled")]'
+    TXT_SUBTITLE = '//XCUIElementTypeStaticText[starts-with(@name,"Your booking")]'
+    TXT_VENUE = '//XCUIElementTypeStaticText[starts-with(@name,"Booking #")]/preceding-sibling::XCUIElementTypeStaticText[1]'
+    TXT_BOOKING_ID = '//XCUIElementTypeStaticText[starts-with(@name,"Booking #")]'
+    TXT_FIELD = '//XCUIElementTypeStaticText[@name="{}"]'
+    TXT_VALUE_BY_LABEL = '//XCUIElementTypeStaticText[@name="{}"]/following-sibling::XCUIElementTypeStaticText[1]'
+    TXT_REFUND_LABEL = '//XCUIElementTypeStaticText[starts-with(@name,"Refund")]'
+    BTN_FINISH = '//XCUIElementTypeButton[@name="Finish"]'
+    BTN_SEE_BOOKING_DETAILS = '//XCUIElementTypeButton[@name="See booking details"]'

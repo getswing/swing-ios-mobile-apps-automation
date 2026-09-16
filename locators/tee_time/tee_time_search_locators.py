@@ -1,0 +1,11 @@
+class TeeTimeSearchLocators:
+    INPUT_SEARCH = '//XCUIElementTypeOther[XCUIElementTypeOther[@name="ID"]]/preceding-sibling::XCUIElementTypeTextField[1]'
+    BTN_BACK = '//XCUIElementTypeOther[XCUIElementTypeTextField]/preceding-sibling::XCUIElementTypeButton[1]'
+    BTN_CLEAR = '//XCUIElementTypeTextField/following-sibling::XCUIElementTypeImage[1]'
+    BTN_KEYBOARD_SEARCH = '//XCUIElementTypeButton[@name="Search"]'
+    EL_COUNTRY = '//XCUIElementTypeOther[@name="ID"]'
+    TXT_RECENT_SEARCHES = '//XCUIElementTypeStaticText[@name="Your recent searches"]'
+    BTN_RECENT_BY_NAME = '//XCUIElementTypeButton[@name="{}"]'
+    LIST_RECENT_SEARCHES = '//XCUIElementTypeStaticText[@name="Your recent searches"]/following-sibling::XCUIElementTypeOther//XCUIElementTypeButton'
+    TXT_RESULT_COUNT = '//XCUIElementTypeStaticText[contains(@name,"golf course (s) found")]'
+    EL_RESULT_BY_NAME = '//XCUIElementTypeOther[starts-with(@name,"{}")]'

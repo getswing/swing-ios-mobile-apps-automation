@@ -1,0 +1,12 @@
+class SportOptionLocators:
+    EL_TITLE = '//XCUIElementTypeOther[@name="sport_option_page_title"]'
+    LIST_SPORTS = '//XCUIElementTypeScrollView'
+    LIST_SPORT_CARDS = '//XCUIElementTypeOther[starts-with(@name,"sport_option_card_")]'
+    CELL_SPORT = '//XCUIElementTypeOther[@name="sport_option_card_{}"]'
+    CELL_SPORT_BY_LABEL = '//XCUIElementTypeOther[starts-with(@name,"sport_option_card_") and @label="{}"]'
+    CELL_GOLF = '//XCUIElementTypeOther[@name="sport_option_card_GOLF"]'
+    CELL_BILLIARD = '//XCUIElementTypeOther[@name="sport_option_card_BILLIARD"]'
+    CELL_PADEL = '//XCUIElementTypeOther[@name="sport_option_card_PADEL"]'
+    TXT_BETA = '//XCUIElementTypeStaticText[@name="BETA"]'
+    TXT_COMING_SOON = '//XCUIElementTypeStaticText[@name="COMING SOON"]'
+    TXT_BADGE_FOR_SPORT = '//XCUIElementTypeOther[@name="sport_option_card_{}"]/following-sibling::XCUIElementTypeStaticText[1]'

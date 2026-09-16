@@ -1,0 +1,10 @@
+class AddOnsLocators:
+    TXT_TITLE = '//XCUIElementTypeStaticText[@name="Select add-ons"]'
+    TXT_FOR_PLAYER = '//XCUIElementTypeStaticText[starts-with(@name,"For ")]'
+    EL_ITEM_BY_NAME = '//XCUIElementTypeOther[starts-with(@name,"{}")]'
+    BTN_DECREASE_BY_ITEM = '//XCUIElementTypeOther[starts-with(@name,"{}")]/following-sibling::XCUIElementTypeButton[1]'
+    BTN_INCREASE_BY_ITEM = '//XCUIElementTypeOther[starts-with(@name,"{}")]/following-sibling::XCUIElementTypeButton[2]'
+    LIST_ITEMS = '//XCUIElementTypeOther[contains(@name,"Rp.")]'
+    BTN_SAVE = '//XCUIElementTypeButton[starts-with(@name,"Save ")]'
+    BTN_CANCEL = '//XCUIElementTypeButton[@name="Cancel"]'
+    TXT_SCRIM = '//XCUIElementTypeStaticText[@name="Scrim"]'

@@ -1,0 +1,13 @@
+class CreditsInfoLocators:
+    EL_HEADER = '//XCUIElementTypeOther[@name="What is Swing Credits?"]'
+    BTN_BACK = '//XCUIElementTypeOther[@name="What is Swing Credits?"]/preceding-sibling::XCUIElementTypeButton[1]'
+    IMG_BENEFIT_BY_TITLE = '//XCUIElementTypeImage[starts-with(@name,"{}")]'
+    IMG_BENEFIT_ENDLESS_CASHBACKS = '//XCUIElementTypeImage[starts-with(@name,"Endless cashbacks")]'
+    IMG_BENEFIT_PARTIAL_PAYMENT = '//XCUIElementTypeImage[starts-with(@name,"Partial payment method")]'
+    IMG_BENEFIT_SWING_PASS = '//XCUIElementTypeImage[starts-with(@name,"Earn more with Swing Pass")]'
+    IMG_BENEFIT_REDEEM_REWARDS = '//XCUIElementTypeImage[starts-with(@name,"Redeem rewards")]'
+    TXT_FAQ_TITLE = '//XCUIElementTypeStaticText[@name="FAQs"]'
+    IMG_FAQ_BY_QUESTION = '//XCUIElementTypeImage[starts-with(@name,"{}")]'
+    LIST_FAQ = '//XCUIElementTypeImage[contains(@name,"Swing Credits")]'
+    TXT_CONTACT_PROMPT = '//XCUIElementTypeStaticText[starts-with(@name,"Got more questions")]'
+    BTN_CONTACT_US = '//XCUIElementTypeButton[@name="Contact us"]'

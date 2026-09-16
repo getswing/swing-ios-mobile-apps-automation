@@ -1,0 +1,11 @@
+class ChangeBookingLocators:
+    EL_TITLE = '//XCUIElementTypeOther[@name="Change Booking"]'
+    BTN_BACK = '//XCUIElementTypeOther[@name="Change Booking"]/preceding-sibling::XCUIElementTypeButton[1]'
+    TAB_RESCHEDULE = '//*[@name="change_booking_tab_reschedule"]'
+    TAB_CANCELLATION = '//*[@name="change_booking_tab_cancellation"]'
+    TXT_RESCHEDULE_POLICY = '//XCUIElementTypeStaticText[@name="Reschedule policy"]'
+    TXT_CANCELLATION_POLICY = '//XCUIElementTypeStaticText[@name="Cancellation policy"]'
+    LIST_POLICY_RULES = '//XCUIElementTypeStaticText[starts-with(@name,"•")]'
+    TXT_POLICY_HINT = '//XCUIElementTypeStaticText[starts-with(@name,"You can ")]'
+    BTN_CONTINUE_RESCHEDULE = '//XCUIElementTypeButton[@name="Continue reschedule"]'
+    BTN_CONTINUE_CANCEL = '//XCUIElementTypeButton[@name="Continue cancel"]'

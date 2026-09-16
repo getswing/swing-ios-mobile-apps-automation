@@ -1,0 +1,11 @@
+class DrivingRangeListLocators:
+    TXT_TITLE = '//XCUIElementTypeStaticText[@name="Book & explore\ndriving range"]'
+    IMG_SEARCH = '//XCUIElementTypeImage[starts-with(@name,"Search")]'
+    EL_COUNTRY = '//XCUIElementTypeOther[@name="ID"]'
+    EL_COUNTRY_BY_CODE = '//XCUIElementTypeOther[@name="{}"]'
+    IMG_SWING_PASS_FILTER = '//XCUIElementTypeImage[@name="Only show Swing Pass partners"]'
+    SWITCH_SWING_PASS_FILTER = '//XCUIElementTypeImage[@name="Only show Swing Pass partners"]/following-sibling::XCUIElementTypeSwitch'
+    LIST_CARDS = '//XCUIElementTypeOther[@name="product_explore_card_final_price"]'
+    EL_CARD_BY_TEXT = '//XCUIElementTypeOther[contains(@label,"{}")]'
+    IMG_SAVE_BADGE = '//XCUIElementTypeImage[@name="product_explore_card_save_badge"]'
+    BTN_BACK = '//XCUIElementTypeOther[XCUIElementTypeImage[starts-with(@name,"Search")]]/preceding-sibling::XCUIElementTypeButton[1] | //XCUIElementTypeImage[starts-with(@name,"Search")]/preceding-sibling::XCUIElementTypeButton[1]'

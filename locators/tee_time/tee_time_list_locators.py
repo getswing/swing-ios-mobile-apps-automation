@@ -1,0 +1,12 @@
+class TeeTimeListLocators:
+    TXT_TITLE = '//XCUIElementTypeStaticText[@name="Book & explore\ntee time"]'
+    IMG_SEARCH = '//XCUIElementTypeImage[@name="Search golf courses..."]'
+    BTN_BACK = '//XCUIElementTypeOther[XCUIElementTypeImage[@name="Search golf courses..."]]/preceding-sibling::XCUIElementTypeButton[1]'
+    EL_COUNTRY = '//XCUIElementTypeOther[@name="ID"]'
+    EL_COUNTRY_BY_CODE = '//XCUIElementTypeOther[@name="{}"]'
+    IMG_SWING_PASS_FILTER = '//XCUIElementTypeImage[@name="Only show Swing Pass partners"]'
+    SWITCH_SWING_PASS_FILTER = '//XCUIElementTypeImage[@name="Only show Swing Pass partners"]/following-sibling::XCUIElementTypeSwitch'
+    EL_CARD_BY_TEXT = '//XCUIElementTypeOther[contains(@label,"{}")]'
+    LIST_CARDS = '//XCUIElementTypeOther[contains(@label,"km away")]'
+    EL_CARD_FINAL_PRICE = '//XCUIElementTypeOther[@name="product_explore_card_final_price"]'
+    IMG_SAVE_BADGE = '//XCUIElementTypeImage[@name="product_explore_card_save_badge"]'

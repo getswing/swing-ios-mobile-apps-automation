@@ -1,0 +1,13 @@
+class AvailablePromosLocators:
+    EL_HEADER = '//XCUIElementTypeOther[@name="Available promos"]'
+    BTN_BACK = '//XCUIElementTypeOther[@name="Available promos"]/preceding-sibling::XCUIElementTypeButton[1]'
+    EL_SEARCH = '//XCUIElementTypeOther[@name="Search here..."]'
+    INPUT_SEARCH = '//XCUIElementTypeOther[@name="Search here..."]/following-sibling::XCUIElementTypeTextField'
+    TXT_FEATURED_TITLE = '//XCUIElementTypeStaticText[@name="Featured promos"]'
+    EL_APPLIED_PROMO = '//XCUIElementTypeOther[starts-with(@name,"Promo auto applied for you!")]'
+    IMG_PROMO_BY_NAME = '//XCUIElementTypeImage[starts-with(@name,"{}")]'
+    TXT_QUOTA_BY_PROMO = '//XCUIElementTypeImage[starts-with(@name,"{}")]/following-sibling::XCUIElementTypeStaticText[1]'
+    BTN_APPLY_BY_PROMO = '//XCUIElementTypeImage[starts-with(@name,"{}")]/following-sibling::XCUIElementTypeButton[1]'
+    BTN_APPLY = '//XCUIElementTypeButton[@name="Apply"]'
+    BTN_REMOVE_PROMO = '//XCUIElementTypeButton[@name="Remove promo"]'
+    BTN_ADD_PROMO_CODE = '//XCUIElementTypeButton[@name="Add a promo code"]'

@@ -1,0 +1,11 @@
+class RescheduleDetailsLocators:
+    EL_TITLE = '//XCUIElementTypeOther[@name="Reschedule details"]'
+    BTN_BACK = '//XCUIElementTypeOther[@name="Reschedule details"]/preceding-sibling::XCUIElementTypeButton[1]'
+    TXT_VENUE = '//XCUIElementTypeStaticText[contains(@name,"Driving Range")]'
+    TXT_BOOKING_ID = '//XCUIElementTypeStaticText[starts-with(@name,"#")]'
+    TXT_FIELD = '//XCUIElementTypeStaticText[@name="{}"]'
+    IMG_DATE_CHANGE = '//XCUIElementTypeImage[starts-with(@name,"Original date")]'
+    TXT_REASON_TITLE = '//XCUIElementTypeStaticText[@name="Reschedule reason"]'
+    TXT_RESCHEDULE_FEE = '//XCUIElementTypeStaticText[@name="Reschedule fee"]'
+    IMG_PRICE_DIFFERENCE = '//XCUIElementTypeImage[@name="Price difference"]'
+    LIST_CONTENT = '//XCUIElementTypeScrollView'

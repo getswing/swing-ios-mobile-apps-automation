@@ -1,0 +1,11 @@
+class BayPickerLocators:
+    TXT_TITLE = '//XCUIElementTypeStaticText[@name="How many bays?"]'
+    BTN_BACK = '//XCUIElementTypeStaticText[@name="How many bays?"]/preceding-sibling::XCUIElementTypeButton[1]'
+    TXT_NUMBER_OF_BAYS = '//XCUIElementTypeStaticText[@name="Number of bays"]'
+    TXT_HINT = '//XCUIElementTypeStaticText[@name="Prices will be added accordingly."]'
+    BTN_DECREASE = '//XCUIElementTypeStaticText[@name="Prices will be added accordingly."]/following-sibling::XCUIElementTypeButton[1]'
+    TXT_BAY_COUNT = '//XCUIElementTypeStaticText[@name="Prices will be added accordingly."]/following-sibling::XCUIElementTypeStaticText[1]'
+    BTN_INCREASE = '//XCUIElementTypeStaticText[@name="Prices will be added accordingly."]/following-sibling::XCUIElementTypeButton[2]'
+    BTN_CONFIRM = '//XCUIElementTypeButton[@name="Confirm bays"]'
+    TXT_SCRIM = '//XCUIElementTypeStaticText[@name="Scrim"]'
+    TXT_MAXIMUM_BAYS = '//XCUIElementTypeStaticText[@name="You can only select up to {} bays"]'

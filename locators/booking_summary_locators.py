@@ -1,0 +1,11 @@
+class BookingSummaryLocators:
+    EL_TITLE = '//XCUIElementTypeOther[@name="Booking summary"]'
+    BTN_BACK = '//XCUIElementTypeOther[@name="Booking summary"]/preceding-sibling::XCUIElementTypeButton[1]'
+    TXT_FIELD = '//XCUIElementTypeStaticText[@name="{}"]'
+    TXT_NOTES_TITLE = '//XCUIElementTypeStaticText[starts-with(@name,"Notes to")]'
+    TXT_NOTES_VALUE = '//XCUIElementTypeStaticText[contains(@name,"reservation notes")]'
+    TXT_TERMS_TITLE = '//XCUIElementTypeStaticText[@name="Terms & conditions"]'
+    TXT_PRICE_DETAILS_TITLE = '//XCUIElementTypeStaticText[starts-with(@name,"Price details")]'
+    TXT_TOTAL_PAYMENT = '//XCUIElementTypeStaticText[starts-with(@name,"Total payment")]'
+    EL_PROCESSING_FEE = '//XCUIElementTypeOther[starts-with(@name,"Processing fee")]'
+    LIST_CONTENT = '//XCUIElementTypeScrollView'

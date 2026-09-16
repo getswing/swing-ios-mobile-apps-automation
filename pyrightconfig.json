@@ -1,0 +1,9 @@
+{
+  "venvPath": ".",
+  "venv": ".my-env",
+  "extraPaths": ["."],
+  "include": ["tests", "flows", "pages", "locators", "helpers", "fixtures", "config", "test_data"],
+  "exclude": ["**/__pycache__", ".my-env"],
+  "typeCheckingMode": "basic",
+  "reportMissingImports": "warning"
+}

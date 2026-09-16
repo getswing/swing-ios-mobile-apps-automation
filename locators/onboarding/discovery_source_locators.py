@@ -1,0 +1,13 @@
+class DiscoverySourceLocators:
+    EL_TITLE = '//XCUIElementTypeOther[@name="How did you find out about Swing?"]'
+    IMG_SOCIAL_MEDIA = '//XCUIElementTypeImage[@name="Social media"]'
+    IMG_ARTICLE_OR_BLOGS = '//XCUIElementTypeImage[@name="Article or blogs"]'
+    IMG_RECOMMENDED_BY_FRIENDS = '//XCUIElementTypeImage[@name="Recommended by friends or family"]'
+    IMG_WEB_SEARCH = '//XCUIElementTypeImage[@name="Web search"]'
+    IMG_OFFLINE_ADVERTISEMENT = '//XCUIElementTypeImage[@name="Offline advertisement"]'
+    IMG_A_SWING_EVENT = '//XCUIElementTypeImage[@name="A Swing event"]'
+    IMG_OTHERS = '//XCUIElementTypeImage[@name="Others"]'
+    IMG_OPTION_BY_NAME = '//XCUIElementTypeImage[@name="{}"]'
+    LIST_OPTIONS = '//XCUIElementTypeImage[@name="Social media"]/parent::XCUIElementTypeOther/XCUIElementTypeImage'
+    BTN_PREVIOUS = '//XCUIElementTypeButton[@name="Previous"]'
+    BTN_FINISH = '//XCUIElementTypeButton[@name="Finish"]'

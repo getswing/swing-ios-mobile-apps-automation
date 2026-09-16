@@ -1,0 +1,6 @@
+tc_name: Login with valid phone number
+region: ID
+country: ID (+62)
+country_name: Indonesia
+phone_number: "81234567890"
+add_ons: []

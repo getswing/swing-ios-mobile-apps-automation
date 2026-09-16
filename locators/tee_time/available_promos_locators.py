@@ -1,0 +1,12 @@
+class TeeTimeAvailablePromosLocators:
+    EL_HEADER = '//XCUIElementTypeOther[@name="Available promos"]'
+    BTN_BACK = '//XCUIElementTypeOther[@name="Available promos"]/preceding-sibling::XCUIElementTypeButton[1]'
+    EL_SEARCH = '//XCUIElementTypeOther[@name="Search here..."]'
+    INPUT_SEARCH = '//XCUIElementTypeOther[@name="Search here..."]/following-sibling::XCUIElementTypeTextField'
+    TXT_FEATURED_TITLE = '//XCUIElementTypeStaticText[starts-with(@name,"Featured promos for")]'
+    EL_APPLIED_PROMO = '//XCUIElementTypeOther[starts-with(@name,"Promo auto applied for")]'
+    EL_PROMO_BY_NAME = '//XCUIElementTypeOther[contains(@name,"{}")]'
+    TXT_QUOTA = '//XCUIElementTypeStaticText[contains(@name," left")]'
+    BTN_APPLY = '//XCUIElementTypeButton[@name="Apply"]'
+    BTN_REMOVE_PROMO = '//XCUIElementTypeButton[@name="Remove promo"]'
+    BTN_ADD_PROMO_CODE = '//XCUIElementTypeButton[@name="Add a promo code"]'
