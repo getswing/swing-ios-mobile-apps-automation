@@ -13,6 +13,8 @@ from pages.driving_range.payment_gateway_page import PaymentGatewayPage
 from pages.event.registration_success_page import RegistrationSuccessPage
 from pages.event.registration_details_page import RegistrationDetailsPage
 from pages.event.registration_summary_page import RegistrationSummaryPage
+from pages.tee_time.available_promos_page import TeeTimeAvailablePromosPage
+from helpers import amounts
 
 
 class EventFlow(BaseFlow):
@@ -25,6 +27,7 @@ class EventFlow(BaseFlow):
         self.details = self.page(EventDetailsPage)
         self.method = self.page(RegistrationMethodPage)
         self.confirm = self.page(RegistrationConfirmationPage)
+        self.promos = self.page(TeeTimeAvailablePromosPage)
         self.player_form = self.page(PlayerDetailsPage)
         self.player = self.page(EventAddPlayerPage)
         self.country = self.page(CountryPickerPage)
@@ -159,6 +162,141 @@ class EventFlow(BaseFlow):
     def choose_payment_method(self, name):
         self.payment.select_method(name)
         self.confirm.verify_screen()
+
+    def player_names(self, players):
+        if not players:
+            return []
+        if isinstance(players, str):
+            return [players]
+        if isinstance(players, dict):
+            return [players["player"]]
+        return [player["player"] if isinstance(player, dict) else str(player) for player in players]
+
+    def invite_player(self, player):
+        self.add_player()
+        if str(player.get("add_method", "search")).lower() == "manual":
+            self.open_add_manually()
+            self.fill_player(player.get("first_name"), player.get("last_name"),
+                             player.get("phone_number"))
+            self.save_player()
+        else:
+            self.search_friend(player.get("search_keyword") or player.get("username"))
+            self.select_friend(player.get("username"))
+
+    def invite_players(self, players):
+        for player in players or []:
+            if str(player.get("add_method", "")).lower() not in ("", "host"):
+                self.invite_player(player)
+
+    def fill_players_details(self, players, answer=""):
+        for player in players or []:
+            self.open_player_details(player["player"])
+            if answer:
+                self.answer_question(answer)
+            self.save_player_details()
+
+    def open_promos(self, player):
+        self.confirm.open_promos(player)
+        self.promos.verify_screen()
+
+    def apply_player_promo(self, player, promo_name):
+        self.open_promos(player)
+        self.promos.search_promo(promo_name)
+        self.promos.apply_promo()
+        self.confirm.verify_screen()
+
+    def apply_player_promos(self, players):
+        for player in players or []:
+            if player.get("promo_name"):
+                self.apply_player_promo(player["player"], player["promo_name"])
+
+    def verify_players_promos(self, players):
+        names = [player["promo_name"] for player in players or [] if player.get("promo_name")]
+        for player in players or []:
+            text = self.confirm.player_promo_text(player["player"])
+            if player.get("promo_name"):
+                assert player["promo_name"] in text, (
+                    f"{player['player']} does not show the promo: expected "
+                    f"{player['promo_name']}, found {text}")
+            else:
+                for name in names:
+                    assert name not in text, f"{player['player']} should not use the promo {name}"
+
+    def verify_registration_confirmation_players(self, players):
+        self.confirm.verify_screen()
+        assert self.confirm.player_count() == len(players or []), (
+            f"expected {len(players or [])} players, found {self.confirm.player_count()}")
+        for player in self.player_names(players):
+            assert self.confirm.has_player(player), f"{player} not in the registration"
+
+    def verify_registration_information(self, date, starting_time, venue, registration_type, players):
+        self.confirm.verify_screen()
+        assert date in self.confirm.date_text(), (
+            f"date does not match: expected {date}, found {self.confirm.date_text()}")
+        assert starting_time in self.confirm.starting_time_text(), (
+            f"starting time does not match: expected {starting_time}, "
+            f"found {self.confirm.starting_time_text()}")
+        assert venue in self.confirm.venue_text(), (
+            f"venue does not match: expected {venue}, found {self.confirm.venue_text()}")
+        if registration_type:
+            assert registration_type in self.confirm.registration_type_text(), (
+                f"registration type does not match: expected {registration_type}, "
+                f"found {self.confirm.registration_type_text()}")
+        assert str(len(players or [])) in self.confirm.players_text(), (
+            f"player count does not match: expected {len(players or [])}, "
+            f"found {self.confirm.players_text()}")
+
+    def get_payment_information_before_payment(self, used_credit="0"):
+        payment_info = {"total_payment": self.confirm.total_payment_text(),
+                        "earned_credit": self.confirm.earned_credits_text()}
+        if str(used_credit) == "1":
+            payment_info["used_credit"] = self.confirm.used_credits_text()
+        return payment_info
+
+    def get_registration_code_after_payment(self):
+        return self.success.registration_code_text()
+
+    def verify_payment_success_event(self, date, starting_time, payment_information, players,
+                                     venue="", payment_method=""):
+        self.success.verify_screen()
+        assert self.success.registration_code_text(), "registration code not shown"
+        assert date in self.success.date_text(), (
+            f"date does not match: expected {date}, found {self.success.date_text()}")
+        assert starting_time in self.success.starting_time_text(), (
+            f"starting time does not match: expected {starting_time}, "
+            f"found {self.success.starting_time_text()}")
+        assert str(len(players or [])) in self.success.players_text(), (
+            f"player count does not match: expected {len(players or [])}, "
+            f"found {self.success.players_text()}")
+        assert amounts.to_number(payment_information["total_payment"]) == amounts.to_number(
+            self.success.total_text()), (
+            f"total does not match: expected {payment_information['total_payment']}, "
+            f"found {self.success.total_text()}")
+        if venue:
+            assert venue in self.success.venue_text(), (
+                f"venue does not match: expected {venue}, found {self.success.venue_text()}")
+        if payment_method:
+            assert payment_method in self.success.payment_method_text(), (
+                f"payment method does not match: expected {payment_method}, "
+                f"found {self.success.payment_method_text()}")
+
+    def verify_registration_details(self, registration_code, date, starting_time, venue="",
+                                    status="UPCOMING"):
+        self.registration.verify_screen()
+        assert registration_code in self.registration.registration_code_text(), (
+            f"registration code does not match: expected {registration_code}, "
+            f"found {self.registration.registration_code_text()}")
+        assert date in self.registration.date_text(), (
+            f"date does not match: expected {date}, found {self.registration.date_text()}")
+        assert starting_time in self.registration.starting_time_text(), (
+            f"starting time does not match: expected {starting_time}, "
+            f"found {self.registration.starting_time_text()}")
+        if venue:
+            assert venue in self.registration.venue_text(), (
+                f"venue does not match: expected {venue}, found {self.registration.venue_text()}")
+        if status:
+            assert self.registration.has_status(status), (
+                f"registration status {status} not shown")
 
     def verify_registration_confirmation(self):
         self.confirm.verify_screen()

@@ -157,7 +157,7 @@ class GolfCourseDetailsPage(BasePage):
     
     def verify_exclusive_swing_pass_promo(self, player_type: str):
         match player_type:
-            case "swing-player":
+            case "swing-pass":
                 assert self.is_visible(L.BTN_PROMO_ACTIVE), "Not Found"
             case "regular-player":
                 assert self.is_visible(L.BTN_PROMO_JOIN), "Not Found"
