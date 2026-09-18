@@ -36,6 +36,10 @@ def to_number(value):
     return -number if direction(value) == "used" else number
 
 
+def credit_text(number):
+    return f"- {abs(int(number)):,}" if number else ""
+
+
 def total(values):
     return sum(to_number(value) for value in values)
 

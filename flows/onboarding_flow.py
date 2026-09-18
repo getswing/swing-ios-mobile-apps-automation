@@ -1,4 +1,5 @@
 from flows.base_flow import BaseFlow
+from helpers.checks import CheckTable
 from pages.onboarding.complete_profile_page import CompleteProfilePage
 from pages.onboarding.birthday_picker_page import BirthdayPickerPage
 from pages.onboarding.nationality_picker_page import NationalityPickerPage
@@ -52,6 +53,29 @@ class OnboardingFlow(BaseFlow):
     def enter_referral_code(self, code):
         self.profile.scroll_to_referral_code()
         self.profile.enter_referral_code(code)
+
+    def verify_profile_information(self, first_name, last_name, birthday="", nationality="",
+                                   gender="", username="", email=""):
+        table = CheckTable("Complete profile")
+        table.equal("First name", first_name, self.profile.first_name_value())
+        table.equal("Last name", last_name, self.profile.last_name_value())
+        if birthday:
+            table.contains("Birthday", birthday, self.profile.birthday_text())
+        if nationality:
+            table.contains("Nationality", nationality, self.profile.nationality_text())
+        if gender:
+            table.contains("Gender", gender, self.profile.gender_text())
+        if username:
+            table.equal("Username", username, self.profile.username_value())
+        if email:
+            table.equal("Email", email, self.profile.email_value())
+        table.verify()
+
+    def verify_discovery_source(self, source):
+        table = CheckTable("How did you hear about us")
+        shown = self.discovery.has_source(source)
+        table.add(source, "shown", "shown" if shown else "not shown", shown)
+        table.verify()
 
     def continue_to_discovery(self):
         self.profile.tap_next()

@@ -27,3 +27,5 @@ class EventTestData(ExcelData):
     PROMO_NAME = ""
     PROMO_CODE = ""
     PAYMENT_METHOD = "DANA"
+    
+    TC_NAME = ""

@@ -5,6 +5,7 @@ from pages.base_page import BasePage
 class PaymentGatewayPage(BasePage):
     ROOT_LOCATOR = L.BTN_PROCEED_TO_PAY
     PAGE_NAME = "PaymentGatewayPage"
+    GATEWAY_TIMEOUT = 5
 
     def verify_screen(self):
         self.wait_until_loaded()
@@ -14,11 +15,13 @@ class PaymentGatewayPage(BasePage):
         return self
 
     def tap_proceed_to_pay(self):
-        self.wait_until_loaded()
-        if self.is_visible(L.BTN_PROCEED_TO_PAY):
-            self.verify_screen()
-            self.capture_step("tap_proceed_to_pay")
-            self.click(L.BTN_PROCEED_TO_PAY)
+        if not self.has_proceed_to_pay():
+            return
+        self.capture_step("tap_proceed_to_pay")
+        self.click(L.BTN_PROCEED_TO_PAY)
+
+    def has_proceed_to_pay(self, timeout=None):
+        return self.is_visible(L.BTN_PROCEED_TO_PAY, timeout or self.GATEWAY_TIMEOUT)
 
     def header_text(self, method):
         return self.label_of(L.EL_HEADER_BY_METHOD.format(method))

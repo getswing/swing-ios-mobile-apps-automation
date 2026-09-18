@@ -27,28 +27,32 @@ def _wait(driver, timeout=None, poll=None):
     )
 
 
+def _until(driver, locator, timeout, condition, expected):
+    seconds = timeout if timeout is not None else settings.EXPLICIT_WAIT
+    try:
+        return _wait(driver, timeout).until(condition(to_tuple(locator)))
+    except TimeoutException:
+        raise TimeoutException(f"element not {expected} after {seconds}s: {locator}") from None
+
+
 def wait_present(driver, locator, timeout=None):
-    return _wait(driver, timeout).until(EC.presence_of_element_located(to_tuple(locator)))
+    return _until(driver, locator, timeout, EC.presence_of_element_located, "found")
 
 
 def wait_visible(driver, locator, timeout=None):
-    return _wait(driver, timeout).until(EC.visibility_of_element_located(to_tuple(locator)))
+    return _until(driver, locator, timeout, EC.visibility_of_element_located, "visible")
 
 
 def wait_clickable(driver, locator, timeout=None):
-    return _wait(driver, timeout).until(EC.element_to_be_clickable(to_tuple(locator)))
+    return _until(driver, locator, timeout, EC.element_to_be_clickable, "clickable")
 
 
 def wait_all_visible(driver, locator, timeout=None):
-    return _wait(driver, timeout).until(
-        EC.visibility_of_all_elements_located(to_tuple(locator))
-    )
+    return _until(driver, locator, timeout, EC.visibility_of_all_elements_located, "visible")
 
 
 def wait_invisible(driver, locator, timeout=None):
-    return _wait(driver, timeout).until(
-        EC.invisibility_of_element_located(to_tuple(locator))
-    )
+    return _until(driver, locator, timeout, EC.invisibility_of_element_located, "gone")
 
 
 def wait_text_present(driver, locator, text, timeout=None):

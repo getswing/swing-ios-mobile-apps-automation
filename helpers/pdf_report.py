@@ -300,7 +300,24 @@ class PdfReport:
         for index, entry in enumerate([e for e in test["steps"] if e.get("evidence")], start=1):
             self._evidence_block(pdf, entry, index)
 
+    def _table_block(self, pdf, entry, index):
+        rows = str(entry.get("table") or "").splitlines()
+        if pdf.get_y() + len(rows) * 4.6 + 20 > pdf.h - FOOTER_H - 6:
+            pdf.add_page()
+        pdf.start_section(_safe(entry["text"]))
+        pdf.set_font("helvetica", "", 11)
+        pdf.set_text_color(*INK)
+        pdf.cell(0, 8, _safe(f"{index}. {entry['text']}"), new_x="LMARGIN", new_y="NEXT")
+        pdf.set_font("courier", "", 8)
+        for row in rows:
+            pdf.set_text_color(*(FAIL_COLOR if row.endswith("FAIL") else INK))
+            pdf.cell(0, 4.6, _safe(row), new_x="LMARGIN", new_y="NEXT")
+        pdf.set_text_color(*INK)
+        pdf.ln(6)
+
     def _evidence_block(self, pdf, entry, index):
+        if entry.get("kind") == "table":
+            return self._table_block(pdf, entry, index)
         shot = entry.get("screenshot")
         size = _image_size(shot) if shot and Path(shot).exists() else None
         image_h = image_w = 0

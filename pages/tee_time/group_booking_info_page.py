@@ -11,6 +11,7 @@ class GroupBookingInfoPage(BasePage):
         assert self.is_visible(L.TXT_TITLE, timeout=20), "Group booking info sheet not shown"
         assert self.is_visible(L.BTN_SWITCH_TO_GROUP, timeout=5), "Group booking switch button not shown"
         assert self.is_visible(L.BTN_LEARN_MORE, timeout=5), "Group booking learn more button not shown"
+        assert self.is_visible(L.BTN_CLOSE, timeout=5), "Group booking close button not shown"
         self.capture_step("group_booking_info")
         return self
 
@@ -34,3 +35,12 @@ class GroupBookingInfoPage(BasePage):
 
     def has_bullet(self, text, timeout=5):
         return self.is_visible(L.TXT_BULLET_BY_TEXT.format(text), timeout)
+
+    def has_sheet(self, timeout=3):
+        return self.is_visible(L.TXT_TITLE, timeout)
+
+    def has_close_button(self, timeout=3):
+        return self.is_visible(L.BTN_CLOSE, timeout)
+
+    def bullet_items(self):
+        return self.texts_of(L.LIST_BULLETS)

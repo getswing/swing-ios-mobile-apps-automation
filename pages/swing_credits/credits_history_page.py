@@ -49,6 +49,29 @@ class CreditsHistoryPage(BasePage):
         assert self.is_visible(L.LIST_ITEM_BY_BOOKING_CODE.format(tag)), (
             f"no swing credit row for {tag}, history shows {self.booking_codes()}")
 
+    def scroll_to_booking_player(self, code, player):
+        self.capture_step("Scroll to booking row", f"{amounts.booking_tag(code)} - {player}")
+        self.scroll_to(L.EL_ITEM_BY_BOOKING_CODE_AND_PLAYER.format(amounts.booking_tag(code), player))
+
+    def has_booking_for_player(self, code, player, timeout=5):
+        return self.is_visible(
+            L.EL_ITEM_BY_BOOKING_CODE_AND_PLAYER.format(amounts.booking_tag(code), player), timeout)
+
+    def booking_label_for_player(self, code, player):
+        return self.label_of(
+            L.EL_ITEM_BY_BOOKING_CODE_AND_PLAYER.format(amounts.booking_tag(code), player))
+
+    def booking_amount_text_for_player(self, code, player):
+        return amounts.amount_text(self.booking_label_for_player(code, player))
+
+    def booking_amount_number_for_player(self, code, player):
+        return amounts.to_number(self.booking_label_for_player(code, player))
+
+    def verify_credit_by_booking_code_player(self, booking_code, player):
+        tag = amounts.booking_tag(booking_code)
+        assert self.has_booking_for_player(booking_code, player), (
+            f"no swing credit row for {tag} and {player}, history shows {self.item_labels()}")
+
     def verify_credit_by_referral_code(self):
         assert self.is_visible(L.LIST_ITEM_BY_BOOKING_CODE.format("Reward for using")), "Credit is not visibile"
     

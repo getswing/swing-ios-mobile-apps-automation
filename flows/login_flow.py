@@ -1,4 +1,5 @@
 from flows.base_flow import BaseFlow
+from helpers.checks import CheckTable
 from pages.country_picker_page import CountryPickerPage
 from pages.login_page import LoginPage
 from pages.verification_method_page import VerificationMethodPage
@@ -44,7 +45,10 @@ class LoginFlow(BaseFlow):
             self.verification_method.select_sms()
         
     def verify_bottom_sheet_verification_method(self):
-        assert self.verification_method.verify_screen(), "Page is not showed"
+        table = CheckTable("Verification method sheet")
+        shown = bool(self.verification_method.verify_screen())
+        table.add("Verification method sheet", "shown", "shown" if shown else "not shown", shown)
+        table.verify()
     
     def enter_otp_code(self, otp: str,country: str, phone_number: str):
         country_code = pycountry.countries.get(name=country)
@@ -61,7 +65,10 @@ class LoginFlow(BaseFlow):
         self.handle_system_alerts()
     
     def verify_button_continue_enable(self):
-        assert self.login.continue_is_enabled(), "Disable"
+        table = CheckTable("Login continue button")
+        enabled = self.login.continue_is_enabled()
+        table.add("Continue button", "enabled", "enabled" if enabled else "disabled", enabled)
+        table.verify()
 
     def verify_country_selected(self, country: str):
         country_code = pycountry.countries.get(name=country)
@@ -69,8 +76,9 @@ class LoginFlow(BaseFlow):
             country_code = pycountry.countries.search_fuzzy(country)[0]
         alpha2 = country_code.alpha_2
         dial_code = phonenumbers.country_code_for_region(alpha2)
-        result = f"{alpha2} (+{dial_code})"
-        assert self.login.selected_country() == result , "Not Same"
+        table = CheckTable("Country selected")
+        table.equal("Country code", f"{alpha2} (+{dial_code})", self.login.selected_country())
+        table.verify()
     
     def verify_page_code_otp(self):
         self.verification_code.verify_screen()

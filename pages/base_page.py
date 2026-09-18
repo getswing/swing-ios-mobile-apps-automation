@@ -18,6 +18,11 @@ def clock_text(minutes):
     return f"{(minutes // 60) % 24:02d}:{minutes % 60:02d}"
 
 
+def line_after(text, label):
+    lines = [line.strip() for line in str(text or "").splitlines()]
+    return lines[lines.index(label) + 1] if label in lines and lines[-1] != label else ""
+
+
 def item_pair(item, name_key, quantity_key):
     if isinstance(item, dict):
         return item[name_key], item[quantity_key]
@@ -175,6 +180,16 @@ class BasePage:
         value = int(digits[-1]) if digits else 0
         reporter.read("quantity of", locator, value)
         return value
+
+    def value_after_line(self, locator, label, timeout=None):
+        value = line_after(self.find(locator, timeout).get_attribute("label"), label)
+        reporter.read(f"value after {label} of", locator, value)
+        return value
+
+    def values_after_line(self, locator, label):
+        values = [line_after(text, label) for text in self.texts_of(locator)]
+        reporter.read(f"values after {label} of", locator, values)
+        return values
 
     def value_after_label(self, locator, timeout=None):
         text = self.find(locator, timeout).get_attribute("label") or ""

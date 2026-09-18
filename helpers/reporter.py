@@ -166,6 +166,12 @@ class Reporter:
     def read(self, verb, locator, value):
         return self.add(f"{verb} {describe(locator)}", kind="read", value=value)
 
+    def table(self, title, text):
+        entry = self.add(title, kind="table", evidence=True)
+        if entry is not None:
+            entry["table"] = text
+        return entry
+
     def note(self, text, evidence=False):
         return self.add(text, kind="note", evidence=evidence)
 

@@ -5,3 +5,7 @@ class GroupBookingInfoLocators:
     BTN_SWITCH_TO_GROUP = '//XCUIElementTypeButton[@name="Switch to group booking"]'
     BTN_CLOSE = '//XCUIElementTypeButton[@name="Switch to group booking"]/following-sibling::XCUIElementTypeButton[1]'
     TXT_SCRIM = '//XCUIElementTypeStaticText[@name="Scrim"]'
+    TXT_BULLET_STANDARD_BOOKING = '//XCUIElementTypeStaticText[starts-with(@name,"On standard bookings")]'
+    TXT_BULLET_GROUP_BOOKING = '//XCUIElementTypeStaticText[starts-with(@name,"On group bookings")]'
+    TXT_BULLET_HOST_CREDITS = '//XCUIElementTypeStaticText[starts-with(@name,"You as a host")]'
+    LIST_BULLETS = '//XCUIElementTypeButton[@name="Learn more about booking methods"]/preceding-sibling::XCUIElementTypeStaticText[not(starts-with(@name,"Adding a"))]'

@@ -163,15 +163,6 @@ class EventFlow(BaseFlow):
         self.payment.select_method(name)
         self.confirm.verify_screen()
 
-    def player_names(self, players):
-        if not players:
-            return []
-        if isinstance(players, str):
-            return [players]
-        if isinstance(players, dict):
-            return [players["player"]]
-        return [player["player"] if isinstance(player, dict) else str(player) for player in players]
-
     def invite_player(self, player):
         self.add_player()
         if str(player.get("add_method", "search")).lower() == "manual":
@@ -224,8 +215,8 @@ class EventFlow(BaseFlow):
 
     def verify_registration_confirmation_players(self, players):
         self.confirm.verify_screen()
-        assert self.confirm.player_count() == len(players or []), (
-            f"expected {len(players or [])} players, found {self.confirm.player_count()}")
+        assert self.confirm.player_count() == self.player_total(players), (
+            f"expected {self.player_total(players)} players, found {self.confirm.player_count()}")
         for player in self.player_names(players):
             assert self.confirm.has_player(player), f"{player} not in the registration"
 
@@ -242,8 +233,8 @@ class EventFlow(BaseFlow):
             assert registration_type in self.confirm.registration_type_text(), (
                 f"registration type does not match: expected {registration_type}, "
                 f"found {self.confirm.registration_type_text()}")
-        assert str(len(players or [])) in self.confirm.players_text(), (
-            f"player count does not match: expected {len(players or [])}, "
+        assert str(self.player_total(players)) in self.confirm.players_text(), (
+            f"player count does not match: expected {self.player_total(players)}, "
             f"found {self.confirm.players_text()}")
 
     def get_payment_information_before_payment(self, used_credit="0"):
@@ -265,8 +256,8 @@ class EventFlow(BaseFlow):
         assert starting_time in self.success.starting_time_text(), (
             f"starting time does not match: expected {starting_time}, "
             f"found {self.success.starting_time_text()}")
-        assert str(len(players or [])) in self.success.players_text(), (
-            f"player count does not match: expected {len(players or [])}, "
+        assert str(self.player_total(players)) in self.success.players_text(), (
+            f"player count does not match: expected {self.player_total(players)}, "
             f"found {self.success.players_text()}")
         assert amounts.to_number(payment_information["total_payment"]) == amounts.to_number(
             self.success.total_text()), (

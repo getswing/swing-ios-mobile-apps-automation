@@ -25,6 +25,41 @@ class BaseFlow:
             self._pages[key] = page_class(self.driver)
         return cast(PageT, self._pages[key])
 
+    def invited_players(self, players):
+        return [player for player in players or []
+                if isinstance(player, dict) and str(player.get("add_method", "")).lower() != "host"]
+
+    def player_number(self, total_players):
+        text = str(total_players).strip()
+        return int(text) if text.isdigit() else 0
+
+    def players_to_invite(self, players, total_players=""):
+        invited = self.invited_players(players)
+        if not str(total_players).strip().isdigit():
+            return invited
+        limit = max(int(total_players) - 1, 0)
+        assert limit <= len(invited), (
+            f"the booking is set to {total_players} players so {limit} have to be invited, "
+            f"but the player data only has {len(invited)}")
+        return invited[:limit]
+
+    def player_total(self, players, total_players=""):
+        return 1 + len(self.players_to_invite(players, total_players))
+
+    def player_names(self, players):
+        if not players:
+            return []
+        if isinstance(players, str):
+            return [players]
+        if isinstance(players, dict):
+            return [players["player"]]
+        return [player["player"] if isinstance(player, dict) else str(player) for player in players]
+
+    def payment_player_names(self, players=None, host="", total_players=""):
+        invited = self.players_to_invite(players, total_players) if total_players else players
+        names = ([host] if host else []) + self.player_names(invited)
+        return list(dict.fromkeys(name for name in names if name))
+
     def step(self, description):
         self.reporter.step(description)
         return self

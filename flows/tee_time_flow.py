@@ -1,4 +1,5 @@
 from flows.base_flow import BaseFlow
+from helpers.checks import CheckTable
 from pages.homepage.home_page import HomePage
 from pages.tee_time.tee_time_list_page import TeeTimeListPage
 from pages.tee_time.tee_time_search_page import TeeTimeSearchPage
@@ -18,11 +19,14 @@ from pages.tee_time.booking_success_page import TeeTimeBookingSuccessPage
 from pages.tee_time.tt_booking_details_page import TeeTimeBookingDetailsPage
 from pages.tee_time.booking_summary_page import TeeTimeBookingSummaryPage
 from pages.tee_time.credits_earnings_page import TeeTimeCreditsEarningsPage
+from pages.swing_credits.swing_credits_page import SwingCreditsPage
+from pages.swing_credits.credits_history_page import CreditsHistoryPage
 from helpers import amounts
 
 
 class TeeTimeFlow(BaseFlow):
     FLOW_NAME = "TeeTimeFlow"
+    APPLY_PROMO_LABEL = "Apply a promo"
 
     def __init__(self, driver, reporter=None):
         super().__init__(driver, reporter)
@@ -45,6 +49,20 @@ class TeeTimeFlow(BaseFlow):
         self.booking = self.page(TeeTimeBookingDetailsPage)
         self.credits = self.page(TeeTimeCreditsEarningsPage)
         self.summary = self.page(TeeTimeBookingSummaryPage)
+        self.credits_history = self.page(SwingCreditsPage)
+        self.history = self.page(CreditsHistoryPage)
+    
+    def open_home_tab(self):
+        self.home.open_home_tab()
+    
+    def open_swing_credits(self):
+        self.home.wait_until_loaded()
+        self.home.open_credits()
+        self.credits_history.verify_screen()
+    
+    def open_swing_credit_history(self):
+        self.credits_history.open_history()
+        self.history.verify_screen()
 
     def open_tee_time(self, member_type=""):
         self.home.open_tee_time()
@@ -102,6 +120,7 @@ class TeeTimeFlow(BaseFlow):
 
     def choose_tee_time(self, time):
         self.details.select_slot(time)
+        
     def see_all_details_sections(self):
         self.details.verify_all_sections()
 
@@ -138,6 +157,10 @@ class TeeTimeFlow(BaseFlow):
         self.group_info.tap_close()
         self.confirm.verify_screen()
 
+    def close_group_booking_info_if_shown(self):
+        if self.group_info.has_close_button():
+            self.group_info.tap_close()
+
     def open_promos(self, player):
         self.confirm.open_promos(player)
         self.promos.verify_screen()
@@ -147,7 +170,6 @@ class TeeTimeFlow(BaseFlow):
 
     def apply_promo(self):
         self.promos.apply_promo()
-        self.confirm.verify_screen()
 
     def apply_player_promo(self, player, promo_name):
         self.open_promos(player)
@@ -159,19 +181,49 @@ class TeeTimeFlow(BaseFlow):
             if player.get("promo_name") and not player.get("promo_code"):
                 self.apply_player_promo(player["player"], player["promo_name"])
 
-    def redeem_player_promo(self, player, code):
+    def redeem_player_promo(self, player, promo_name, promo_code):
         self.open_promos(player)
         self.open_promo_code()
-        self.apply_promo_code(code)
-        self.back_to_confirmation()
+        self.apply_promo_code(promo_code)
+        self.find_promo(promo_name)
+        self.apply_promo()
 
-    def redeem_player_promos(self, players):
-        for player in players or []:
-            if player.get("promo_code"):
-                self.redeem_player_promo(player["player"], player["promo_code"])
 
-    def remove_promo(self):
+    def remove_promo(self, player_name):
+        self.open_promos(player_name)
         self.promos.remove_promo()
+        self.promos.tap_back()
+
+    def remove_player_promo(self, player):
+        self.open_promos(player)
+        self.promos.remove_promo()
+        self.promos.tap_back()
+
+    def verify_promo_removed(self, player):
+        text = self.confirm.player_promo_text(player)
+        assert self.APPLY_PROMO_LABEL in text, ( # type: ignore
+            f"{player} still has a promo applied: "
+            f"expected {self.APPLY_PROMO_LABEL!r}, found {text!r}")
+    
+    def verify_promo_applied(self, player, promo_name):
+        text = self.confirm.player_promo_text(player)
+        assert promo_name in text, ( # type: ignore
+            f"{player} still has a promo applied: "
+            f"expected {promo_name!r}, found {text!r}")
+    
+    def verify_promo_autoapplied(self, player, promo_name):
+        text = self.confirm.player_promo_text(player)
+        assert promo_name in text, ( # type: ignore
+            f"{player} still has a promo applied: "
+            f"expected {promo_name!r}, found {text!r}")
+
+    def remove_promo_and_verify(self, player):
+        self.remove_player_promo(player)
+        self.verify_promo_removed(player)
+
+    def remove_players_promos(self, players, host=""):
+        for player in self.payment_player_names(players, host):
+            self.remove_player_promo(player)
 
     def open_promo_code(self):
         self.promos.open_add_promo_code()
@@ -215,8 +267,12 @@ class TeeTimeFlow(BaseFlow):
         self.addons.tap_cancel()
         self.confirm.verify_screen()
 
-    def use_swing_credits(self):
-        self.confirm.toggle_swing_credits()
+    def use_players_swing_credits(self, players, host=""):
+        for player in self.payment_player_names(players, host):
+            self.use_swing_credits(player)
+
+    def use_swing_credits(self, player_name):
+        self.confirm.toggle_swing_credits(player_name)
 
     def enter_note(self, text):
         self.confirm.enter_note(text)
@@ -230,6 +286,7 @@ class TeeTimeFlow(BaseFlow):
 
     def select_friend(self, username):
         self.player.select_friend(username)
+        self.close_group_booking_info_if_shown()
         self.confirm.verify_screen()
 
     def open_add_manually(self):
@@ -253,6 +310,7 @@ class TeeTimeFlow(BaseFlow):
 
     def save_player(self):
         self.player.tap_save_player()
+        self.close_group_booking_info_if_shown()
         self.confirm.verify_screen()
 
     def remove_player(self, player):
@@ -263,6 +321,8 @@ class TeeTimeFlow(BaseFlow):
         self.payment.verify_screen()
 
     def choose_payment_method(self, name):
+        self.confirm.change_payment_method()
+        self.payment.verify_screen()
         self.payment.select_method(name)
         self.confirm.verify_screen()
 
@@ -277,12 +337,40 @@ class TeeTimeFlow(BaseFlow):
             self.search_friend(player.get("search_keyword") or player.get("username"))
             self.select_friend(player.get("username"))
 
-    def invite_players(self, players):
-        for player in players or []:
-            if str(player.get("add_method", "")).lower() not in ("", "host"):
-                self.invite_player(player)
+    def invite_players(self, players, total_players=""):
+        for player in self.players_to_invite(players, total_players):
+            self.invite_player(player)
+
+    def verify_player_added(self, player):
+        assert self.confirm.has_player(player), (
+            f"{player} was not added to the booking, "
+            f"the confirmation shows {self.confirm.player_count()} players")
+
+    def verify_players_added(self, players, host=""):
+        for player in self.payment_player_names(players, host):
+            self.verify_player_added(player)
+
+    def invite_players_and_remove_promos(self, players, total_players=""):
+        for player in self.players_to_invite(players, total_players):
+            self.invite_player(player)
+            self.verify_player_added(player["player"])
+            self.remove_promo_and_verify(player["player"])
+    
+    def invite_players_only_with_autoapplied_promo(self, players, total_players=""):
+        for player in self.players_to_invite(players, total_players):
+            self.invite_player(player)
+            self.verify_player_added(player["player"])
+            self.verify_promo_autoapplied(player.get("player_label"), player.get("promo_name"))
+    
+    def invite_players_and_redeemed_promos(self, players, total_players=""):
+        for player in self.players_to_invite(players, total_players):
+            self.invite_player(player)
+            self.verify_player_added(player["player"])
+            self.redeem_player_promo(player.get("player_label"), player.get("promo_name"), player.get("promo_code"))
+            self.verify_promo_applied(player.get("player_label"), player.get("promo_name"))
 
     def verify_booking_information(self, date, session, preferred_time, booking_type, players):
+        
         assert date in self.confirm.booking_date_text(), (f"booking date text does not contain date: expected {date}, found {self.confirm.booking_date_text()}")
         assert session in self.confirm.session_text(), (f"session text does not contain session: expected {session}, found {self.confirm.session_text()}")
         assert preferred_time in self.confirm.preferred_time_text(), (f"preferred time text does not contain preferred time: expected {preferred_time}, found {self.confirm.preferred_time_text()}")
@@ -309,20 +397,15 @@ class TeeTimeFlow(BaseFlow):
             else:
                 self.verify_player_without_promo(player["player"], names)
 
-    def player_names(self, players):
-        if not players:
-            return []
-        if isinstance(players, str):
-            return [players]
-        if isinstance(players, dict):
-            return [players["player"]]
-        return [player["player"] if isinstance(player, dict) else str(player) for player in players]
-
     def verify_auto_applied_promos(self, players, promo_name=""):
         for player in self.player_names(players):
             text = self.confirm.player_promo_text(player)
-            assert promo_name in text if promo_name else "auto applied" in text.lower(), ( # type: ignore
-                f"{player} does not show an auto applied promo")
+            assert promo_name in text if promo_name else "auto applied" in text.lower(), (f"{player} does not show an auto applied promo") # type: ignore
+            
+    def verify_auto_applied_promos_host(self, host_name, promo_name=""):
+        text = self.confirm.player_promo_text(host_name)
+        assert promo_name in text if promo_name else "auto applied" in text.lower(), (f"{host_name} does not show an auto applied promo") # type: ignore
+            
 
     def verify_players_without_promo(self, players, promo_names=()):
         for player in self.player_names(players):
@@ -331,67 +414,116 @@ class TeeTimeFlow(BaseFlow):
     def apply_promo_for(self, player, promo_name):
         self.apply_player_promo(player, promo_name)
 
-    def redeem_promo_for(self, player, code):
-        self.redeem_player_promo(player, code)
-
     def verify_player_addons(self, player, name):
         assert name in self.confirm.player_addons_text(player), (f"player addons text(player) does not contain name: expected {name}, found {self.confirm.player_addons_text(player)}")
 
-    def get_payment_information_before_payment(self, used_credit="0"):
-        return self.confirm.payment_information(used_credit)
+    def open_price_details(self):
+        self.confirm.scroll_to_price_details()
+
+    def get_payment_information_before_payment(self, used_credit="0", players=None, host=""):
+        self.open_price_details()
+        return self.confirm.payment_information(used_credit, self.payment_player_names(players, host))
+
+    def payment_players(self, payment_information):
+        return list((payment_information or {}).get("players") or {})
+
+    def payment_players_count(self, payment_information):
+        return len(self.payment_players(payment_information))
+
+    def verify_payment_success_payment_information(self, date, session, preferred_time,
+                                                   payment_information, venue="", payment_method=""):
+        self.verify_payment_success_tee_time(date, session, preferred_time, payment_information, venue, payment_method, str(self.payment_players_count(payment_information))) # type: ignore
+
+    def verify_booking_details_payment_information(self, booking_code, date, session, preferred_time,
+                                                   payment_information, status="UPCOMING"):
+        self.verify_data_booking_details(
+            booking_code, date, session, preferred_time, payment_information,
+            str(self.payment_players_count(payment_information)), status)
+
+    def verify_payment_information(self, payment_information, players=None, host=""):
+        lines = payment_information.get("players") or {}
+        table = CheckTable("Price details")
+        for player in self.payment_player_names(players, host):
+            table.truthy(f"{player} - price line", lines.get(player, {}).get("price_line", ""))
+            table.truthy(f"{player} - publish rate", lines.get(player, {}).get("publish_rate", ""))
+        table.truthy("Total payment", payment_information.get("total_payment"))
+        table.verify()
+
+    def verify_player_used_credits(self, player, expected_amount):
+        used = self.confirm.player_used_credits(player)
+        expected = abs(amounts.to_number(expected_amount))
+        assert used == expected, (
+            f"swing credits used for {player} do not match: expected {expected}, found {used}")
+
+    def used_credits_applied(self, payment_information):
+        return bool(amounts.to_number((payment_information or {}).get("used_credit", "")))
+
+    def verify_players_used_credits(self, payment_information, players=None, host=""):
+        if not self.used_credits_applied(payment_information):
+            self.log.info("swing credits were not used on this booking, skipping the credits check")
+            return
+        lines = payment_information.get("players") or {}
+        names = self.payment_player_names(players, host) or list(lines)
+        for player in names:
+            assert self.confirm.has_player_used_credits(player), (
+                f"{player} does not show a swing credits used line")
+        table = CheckTable("Swing Credits used")
+        for player in names:
+            table.truthy(f"{player} - credits line", lines.get(player, {}).get("used_credit", ""))
+        used = sum(abs(amounts.to_number(lines.get(player, {}).get("used_credit", "")))
+                   for player in names)
+        table.amount("Credits total", payment_information.get("used_credit", ""), used)
+        table.verify()
 
     def get_booking_code_after_payment(self):
         return self.success.booking_code_text()
 
     def verify_payment_success_tee_time(self, date, session, preferred_time, payment_information, venue="", payment_method="", player=1):
         self.success.verify_screen()
-        assert self.success.booking_code_text(), "Booking code not shown on the success screen"
-        assert date in self.success.booking_date_text(), (f"booking date text does not contain date: expected {date}, found {self.success.booking_date_text()}")
+        table = CheckTable("Payment successful")
+        table.truthy("Booking code", self.success.booking_code_text())
+        table.contains("Booking date", date, self.success.booking_date_text())
         if session:
-            assert session in self.success.session_text(), (f"session text does not contain session: expected {session}, found {self.success.session_text()}")
-        assert preferred_time in self.success.preferred_time_text(), (f"preferred time text does not contain preferred time: expected {preferred_time}, found {self.success.preferred_time_text()}")
-        assert str(player) in self.success.players_text(), (f"players text does not contain str(player): expected {str(player)}, found {self.success.players_text()}") # type: ignore
-        assert payment_information["total_payment"] in self.success.total_text(), (
-            f"total on the success screen does not match: expected "
-            f"{payment_information['total_payment']}, found {self.success.total_text()}")
+            table.contains("Session", session, self.success.session_text())
+        table.contains("Preferred time", preferred_time, self.success.preferred_time_text())
+        table.contains("No. of players", player, self.success.players_text())
+        table.amount("Total payment", payment_information["total_payment"], self.success.total_text())
         if venue:
-            assert venue in self.success.venue_text(), (f"venue text does not contain venue: expected {venue}, found {self.success.venue_text()}") # type: ignore
+            table.contains("Venue", venue, self.success.venue_text())
         if payment_method:
-            assert payment_method in self.success.payment_method_text(), (f"payment method text does not contain payment method: expected {payment_method}, found {self.success.payment_method_text()}") # type: ignore
+            table.contains("Payment method", payment_method, self.success.payment_method_text())
         if payment_information.get("earned_credit"):
-            assert payment_information["earned_credit"] in self.success.earned_credits_text(), (
-            f"earned credits on the success screen do not match: expected "
-            f"{payment_information['earned_credit']}, found {self.success.earned_credits_text()}")
+            table.amount("Swing Credits earned", payment_information["earned_credit"],
+                         self.success.earned_credits_text())
+        table.verify()
 
     def verify_data_booking_details(self, booking_code, date, session, preferred_time,
                                     payment_information, player="1", status="UPCOMING"):
         self.booking.verify_screen()
-        assert booking_code in self.booking.booking_code_text(), (f"booking code text does not contain booking code: expected {booking_code}, found {self.booking.booking_code_text()}")
-        assert date in self.booking.booking_date_text(), (f"booking date text does not contain date: expected {date}, found {self.booking.booking_date_text()}")
+        table = CheckTable("Booking details")
+        table.contains("Booking code", amounts.booking_tag(booking_code), self.booking.booking_code_text())
+        table.contains("Booking date", date, self.booking.booking_date_text())
         if session:
-            assert session in self.booking.session_text(), (f"session text does not contain session: expected {session}, found {self.booking.session_text()}")
-        assert preferred_time in self.booking.preferred_time_text(), (f"preferred time text does not contain preferred time: expected {preferred_time}, found {self.booking.preferred_time_text()}")
-        assert str(player) in self.booking.players_text(), (f"players text does not contain str(player): expected {str(player)}, found {self.booking.players_text()}") # type: ignore
-        assert amounts.to_number(payment_information["total_payment"]) == amounts.to_number(
-            self.booking.total_payment_text()), (
-            f"total payment on the booking details does not match: expected "
-            f"{payment_information['total_payment']}, found {self.booking.total_payment_text()}")
+            table.contains("Session", session, self.booking.session_text())
+        table.contains("Preferred time", preferred_time, self.booking.preferred_time_text())
+        table.contains("No. of players", player, self.booking.players_text())
+        table.amount("Total payment", payment_information["total_payment"], self.booking.total_payment_text())
         if status:
-            assert self.booking.has_status(status), f"booking status {status} not shown"
+            table.add("Status", status, status if self.booking.has_status(status) else "not shown",
+                      self.booking.has_status(status))
         if payment_information.get("earned_credit"):
-            assert amounts.to_number(payment_information["earned_credit"]) == amounts.to_number(
-                self.booking.earned_credits_text()), (
-                f"earned credits on the booking details do not match: expected "
-                f"{payment_information['earned_credit']}, found {self.booking.earned_credits_text()}")
+            table.amount("Swing Credits earned", payment_information["earned_credit"],
+                         self.booking.earned_credits_text())
+        table.verify()
 
     def get_booking_details_information(self):
         return self.booking.payment_information()
 
     def pay_now(self):
         self.confirm.tap_pay_now()
+        self.proceed_to_pay()
 
     def proceed_to_pay(self):
-        self.gateway.verify_screen()
         self.gateway.tap_proceed_to_pay()
 
     def verify_payment_success(self):
@@ -412,35 +544,37 @@ class TeeTimeFlow(BaseFlow):
         self.summary.tap_back()
         self.booking.verify_screen()
     
+    def back_to_activity(self):
+        self.booking.tap_back()
+    
     def verify_button_exclusive_featured_promo(self, player_type):
         self.details.verify_exclusive_swing_pass_promo(player_type)
     
-    def verify_booking_confirmation_players(self, players):
-        self.confirm.verify_screen()
-        assert self.confirm.player_count() == len(players or []), (
-            f"expected {len(players or [])} players, found {self.confirm.player_count()}")
-        for player in players or []:
-            assert self.confirm.has_player(player["player"]), f"{player['player']} not in the booking"
-            if player.get("promo_name"):
-                assert player["promo_name"] in self.confirm.player_promo_text(player["player"]), (
-                    f"{player['player']} does not show the promo: expected "
-                    f"{player['promo_name']}, found {self.confirm.player_promo_text(player['player'])}")
-            if player.get("add_ons_name"):
-                assert player["add_ons_name"] in self.confirm.player_addons_text(player["player"]), (
-                    f"{player['player']} does not show the add on: expected "
-                    f"{player['add_ons_name']}, found {self.confirm.player_addons_text(player['player'])}")
-            assert self.confirm.price_line_text(player["player"]), (
-                f"price detail line missing for {player['player']}")
+    def verify_confirmation_player(self, player):
+        name = player["player"] if isinstance(player, dict) else str(player)
+        self.confirm.scroll_to_player(name)
+        assert self.confirm.has_player(name), f"{name} not in the booking"
+        self.confirm.scroll_to_player_price_line(name)
+        assert self.confirm.price_line_text(name), f"price detail line missing for {name}"
+        if isinstance(player, dict) and player.get("promo_name"):
+            assert player["promo_name"] in self.confirm.player_promo_text(name), (
+                f"{name} does not show the promo: expected "
+                f"{player['promo_name']}, found {self.confirm.player_promo_text(name)}")
+        if isinstance(player, dict) and player.get("add_ons_name"):
+            assert player["add_ons_name"] in self.confirm.player_addons_text(name), (
+                f"{name} does not show the add on: expected "
+                f"{player['add_ons_name']}, found {self.confirm.player_addons_text(name)}")
+    
 
     def verify_payment_success_players(self, date, session, preferred_time, payment_information,
                                        players, venue="", payment_method=""):
         self.verify_payment_success_tee_time(date, session, preferred_time, payment_information,
-                                             venue, payment_method, str(len(players or []))) # type: ignore
+                                             venue, payment_method, str(self.player_total(players))) # type: ignore
 
     def verify_booking_details_players(self, booking_code, date, session, preferred_time,
                                        payment_information, players, status="UPCOMING"):
         self.verify_data_booking_details(booking_code, date, session, preferred_time,
-                                         payment_information, str(len(players or [])), status)
+                                         payment_information, str(self.player_total(players)), status)
 
     def open_credits_earnings(self):
         self.confirm.open_credits_earnings()
@@ -456,9 +590,52 @@ class TeeTimeFlow(BaseFlow):
         self.credits.tap_got_it()
         self.confirm.verify_screen()
 
-    def verify_booking_confirmation(self, booking_date, session, prefereed_time, method_booking):
-        assert booking_date == self.confirm.booking_date_text(), (f"booking date does not match booking date text: expected {booking_date}, found {self.confirm.booking_date_text()}")
-        assert session == self.confirm.session_text(), (f"session does not match session text: expected {session}, found {self.confirm.session_text()}")
-        assert prefereed_time == self.confirm.preferred_time_text(), (f"prefereed time does not match preferred time text: expected {prefereed_time}, found {self.confirm.preferred_time_text()}")
-        assert method_booking == self.confirm.booking_type_text(), (f"method booking does not match booking type text: expected {method_booking}, found {self.confirm.booking_type_text()}")
-    
+    def verify_booking_confirmation(self, booking_date, session, prefereed_time, method_booking, total_players):
+        self.confirm.go_to_top()
+        table = CheckTable("Booking confirmation")
+        table.equal("Booking date", booking_date, self.confirm.booking_date_text())
+        table.equal("Session", session, self.confirm.session_text())
+        table.equal("Preferred time", prefereed_time, self.confirm.preferred_time_text())
+        table.equal("No. of players", self.player_number(total_players), self.confirm.player_count())
+        table.equal("Booking method", method_booking, self.confirm.booking_type_text())
+        table.verify()
+
+    def verify_used_credit_booking_code(self, booking_code, total_amount):
+        self.history.open_usage_tab()
+        self.history.verify_credit_by_booking_code(booking_code)
+        used = abs(self.history.booking_amount_number(booking_code))
+        expected = abs(amounts.to_number(total_amount))
+        assert used == expected, (
+            f"used credits for {amounts.booking_tag(booking_code)} do not match: "
+            f"expected {expected}, found {used}")
+
+    def verify_used_credit_by_player(self, booking_code, player, expected_amount):
+        self.history.scroll_to_booking_player(booking_code, player)
+        self.history.verify_credit_by_booking_code_player(booking_code, player)
+        used = abs(self.history.booking_amount_number_for_player(booking_code, player))
+        expected = abs(amounts.to_number(expected_amount))
+        assert used == expected, (
+            f"used credits for {amounts.booking_tag(booking_code)} and {player} do not match: "
+            f"expected {expected}, found {used}")
+
+    def verify_used_credit_booking_code_players(self, booking_code, payment_information,
+                                                players=None, host=""):
+        if not self.used_credits_applied(payment_information):
+            self.log.info("swing credits were not used on this booking, skipping the history check")
+            return
+        self.history.open_usage_tab()
+        lines = (payment_information or {}).get("players") or {}
+        names = self.payment_player_names(players, host) or list(lines)
+        rows = [player for player in names if self.history.has_booking_for_player(booking_code, player)]
+        if rows:
+            for player in rows:
+                self.verify_used_credit_by_player(booking_code, player,
+                                                  lines.get(player, {}).get("used_credit", ""))
+            missing = [player for player in names if player not in rows]
+            assert not missing, (
+                f"no swing credit row for {amounts.booking_tag(booking_code)} and {missing}")
+            return
+        total = sum(abs(amounts.to_number(lines.get(player, {}).get("used_credit", "")))
+                    for player in names)
+        self.verify_used_credit_booking_code(
+            booking_code, total or payment_information.get("used_credit", ""))

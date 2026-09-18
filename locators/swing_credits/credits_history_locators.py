@@ -13,3 +13,5 @@ class CreditsHistoryLocators:
     LIST_USED_ITEMS = '//XCUIElementTypeOther[contains(@name,"swing_credit_history_item_") and contains(@label,"used")] | //XCUIElementTypeImage[contains(@name,"swing_credit_history_item_") and contains(@label,"used")]'
     LIST_ITEMS_BY_BOOKING_TYPE = '//XCUIElementTypeOther[contains(@name,"swing_credit_history_item_") and starts-with(@label,"{0}")] | //XCUIElementTypeImage[contains(@name,"swing_credit_history_item_") and starts-with(@label,"{0}")]'
     LIST_ITEM_BY_BOOKING_CODE = '//XCUIElementTypeOther[contains(@label, "{}")]'
+    EL_ITEM_BY_BOOKING_CODE_AND_PLAYER = '//XCUIElementTypeOther[contains(@label,"{0}") and contains(@label,"{1}")] | //XCUIElementTypeImage[contains(@label,"{0}") and contains(@label,"{1}")]'
+    LIST_ITEM_BY_PLAYER = '//XCUIElementTypeOther[contains(@label,"{}")] | //XCUIElementTypeImage[contains(@label,"{}")]'
