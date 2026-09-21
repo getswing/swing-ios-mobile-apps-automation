@@ -221,6 +221,7 @@ class DrivingRangeFlow(BaseFlow):
         self.booking.verify_screen()
     
     def back_to_activity(self):
+        self.wait_for(3)
         self.booking.tap_back()
         
     
@@ -244,6 +245,7 @@ class DrivingRangeFlow(BaseFlow):
         return self.success.booking_code_text()
     
     def verify_minimum_balls(self):
+        self.confirm.tap_pay_now()
         table = CheckTable("Minimum balls")
         shown = self.confirm.is_visible_minimum_toaster()
         table.add("Minimum balls toaster", "shown", "shown" if shown else "not shown", shown)

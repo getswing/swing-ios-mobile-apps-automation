@@ -175,7 +175,12 @@ class BookingConfirmationPage(BasePage):
         return self.duration_between(start_time, end_time)
 
     def is_visible_minimum_toaster(self):
-        return self.is_visible(L.LBL_MINIMUM_BALLS_TOASTER)
+        is_minimum = self.is_visible(L.LBL_MINIMUM_BALLS_TOASTER)
+        if (is_minimum):
+            self.capture_step("show minimum toaster")
+            return self.is_visible(L.LBL_MINIMUM_BALLS_TOASTER)
+        else:
+            return False
     
     def booking_information(self):
         booking_info = {

@@ -175,7 +175,6 @@ class TestDrivingRange:
         driving_range_flow.confirm_bays()
         driving_range_flow.set_items(ITEMS)
         driving_range_flow.choose_payment_method(D.PAYMENT_METHOD)
-        driving_range_flow.pay_now()
         driving_range_flow.verify_minimum_balls()
     
     @pytest.mark.app_reset("clear")
