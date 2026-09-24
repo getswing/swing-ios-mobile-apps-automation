@@ -59,6 +59,7 @@ class GolfCourseDetailsPage(BasePage):
 
     def open_featured_promos(self):
         self.capture_step("open_featured_promos")
+        self.swipe_left_to_element(L.BTN_SEE_ALL_PROMOS, L.EL_PROMO_STRIP)
         self.click(L.BTN_SEE_ALL_PROMOS)
 
     def open_calendar(self):

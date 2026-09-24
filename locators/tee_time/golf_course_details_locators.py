@@ -9,7 +9,7 @@ class GolfCourseDetailsLocators:
     TXT_DISTANCE = '//XCUIElementTypeStaticText[contains(@name,"km away")]'
     IMG_PROMO_BY_NAME = '//XCUIElementTypeImage[starts-with(@name,"{}")]'
     LIST_PROMOS = '//XCUIElementTypeImage[contains(@name,"Valid until")]'
-    EL_PROMO_STRIP = '//XCUIElementTypeButton[@name="See all"]/preceding-sibling::XCUIElementTypeOther[1]'
+    EL_PROMO_STRIP = '(//XCUIElementTypeOther[@name="Golf course details"]/parent::XCUIElementTypeOther/following-sibling::XCUIElementTypeOther/XCUIElementTypeOther/XCUIElementTypeOther//XCUIElementTypeScrollView)[1]'
     BTN_SEE_ALL_PROMOS = '//XCUIElementTypeButton[@name="See all"]'
     EL_CASHBACK_BANNER = '//XCUIElementTypeOther[starts-with(@name,"Earn up to")]'
     BTN_CALENDAR = '//XCUIElementTypeOther[XCUIElementTypeOther[starts-with(@name,"Earn up to")]]/following-sibling::XCUIElementTypeImage[1]'

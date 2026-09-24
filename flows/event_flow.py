@@ -1,4 +1,5 @@
 from flows.base_flow import BaseFlow
+from helpers.checks import CheckTable
 from pages.homepage.home_page import HomePage
 from pages.event.event_list_page import EventListPage
 from pages.event.event_details_page import EventDetailsPage
@@ -14,6 +15,7 @@ from pages.event.registration_success_page import RegistrationSuccessPage
 from pages.event.registration_details_page import RegistrationDetailsPage
 from pages.event.registration_summary_page import RegistrationSummaryPage
 from pages.tee_time.available_promos_page import TeeTimeAvailablePromosPage
+from pages.event.select_package_page import SelectPackagePage
 from helpers import amounts
 
 
@@ -37,6 +39,9 @@ class EventFlow(BaseFlow):
         self.success = self.page(RegistrationSuccessPage)
         self.registration = self.page(RegistrationDetailsPage)
         self.summary = self.page(RegistrationSummaryPage)
+        self.package = self.page(SelectPackagePage)
+
+    # ----------------------------- actions -----------------------------
 
     def open_events(self):
         self.home.open_events()
@@ -65,6 +70,10 @@ class EventFlow(BaseFlow):
     def secure_slot(self):
         self.details.tap_secure_slot()
         self.method.verify_screen()
+
+    def select_package(self, packages):
+        self.package.set_packages(packages)
+        self.package.tap_confirm_packages()
 
     def choose_standard_registration(self):
         self.method.choose_standard_registration()
@@ -160,8 +169,13 @@ class EventFlow(BaseFlow):
         self.payment.verify_screen()
 
     def choose_payment_method(self, name):
+        self.open_payment_method()
         self.payment.select_method(name)
         self.confirm.verify_screen()
+    
+    def add_player_each_packages(self, player):
+        self.confirm.remove_player_without_name()
+        
 
     def invite_player(self, player):
         self.add_player()
@@ -179,12 +193,11 @@ class EventFlow(BaseFlow):
             if str(player.get("add_method", "")).lower() not in ("", "host"):
                 self.invite_player(player)
 
-    def fill_players_details(self, players, answer=""):
-        for player in players or []:
-            self.open_player_details(player["player"])
-            if answer:
-                self.answer_question(answer)
-            self.save_player_details()
+    def fill_players_details(self, player, answer=""):
+        self.open_player_details(player["player"])
+        if answer:
+            self.answer_question(answer)
+        self.save_player_details()
 
     def open_promos(self, player):
         self.confirm.open_promos(player)
@@ -201,17 +214,45 @@ class EventFlow(BaseFlow):
             if player.get("promo_name"):
                 self.apply_player_promo(player["player"], player["promo_name"])
 
-    def verify_players_promos(self, players):
-        names = [player["promo_name"] for player in players or [] if player.get("promo_name")]
-        for player in players or []:
-            text = self.confirm.player_promo_text(player["player"])
-            if player.get("promo_name"):
-                assert player["promo_name"] in text, (
-                    f"{player['player']} does not show the promo: expected "
-                    f"{player['promo_name']}, found {text}")
-            else:
-                for name in names:
-                    assert name not in text, f"{player['player']} should not use the promo {name}"
+    def get_payment_information_before_payment(self, used_credit="0"):
+        payment_info = {"total_payment": self.confirm.total_payment_text(),
+                        "earned_credit": self.confirm.earned_credits_text()}
+        if str(used_credit) == "1":
+            payment_info["used_credit"] = self.confirm.used_credits_text()
+        return payment_info
+
+    def get_registration_code_after_payment(self):
+        return self.success.registration_code_text()
+
+    def pay_now(self):
+        self.confirm.tap_pay_now()
+
+    def proceed_to_pay(self):
+        self.gateway.verify_screen()
+        self.gateway.tap_proceed_to_pay()
+
+    def finish(self):
+        self.success.tap_finish()
+
+    def open_registration_details(self):
+        self.success.open_registration_details()
+        self.registration.verify_screen()
+
+    def open_complete_breakdown(self):
+        self.registration.open_breakdown()
+        self.summary.verify_screen()
+
+    def back_to_registration_details(self):
+        self.summary.tap_back()
+        self.registration.verify_screen()
+
+    # --------------------------- verifications ---------------------------
+
+    def verify_select_page(self):
+        self.package.verify_screen()
+
+    def verify_registration_confirmation(self):
+        self.confirm.verify_screen()
 
     def verify_registration_confirmation_players(self, players):
         self.confirm.verify_screen()
@@ -237,15 +278,77 @@ class EventFlow(BaseFlow):
             f"player count does not match: expected {self.player_total(players)}, "
             f"found {self.confirm.players_text()}")
 
-    def get_payment_information_before_payment(self, used_credit="0"):
-        payment_info = {"total_payment": self.confirm.total_payment_text(),
-                        "earned_credit": self.confirm.earned_credits_text()}
-        if str(used_credit) == "1":
-            payment_info["used_credit"] = self.confirm.used_credits_text()
-        return payment_info
+    def verify_players_promos(self, players):
+        names = [player["promo_name"] for player in players or [] if player.get("promo_name")]
+        for player in players or []:
+            text = self.confirm.player_promo_text(player["player"])
+            if player.get("promo_name"):
+                assert player["promo_name"] in text, (
+                    f"{player['player']} does not show the promo: expected "
+                    f"{player['promo_name']}, found {text}")
+            else:
+                for name in names:
+                    assert name not in text, f"{player['player']} should not use the promo {name}"
 
-    def get_registration_code_after_payment(self):
-        return self.success.registration_code_text()
+    def package_names(self, packages):
+        return [package["package_name"] if isinstance(package, dict) else str(package)
+                for package in packages or []]
+
+    def package_capacity(self, package):
+        return int(package.get("package_capacity", 1) or 1)
+
+    def package_players(self, packages):
+        return sum(int(package.get("package_qty", 0)) * self.package_capacity(package)
+                   for package in packages or [] if isinstance(package, dict))
+
+    def verify_multi_price_packages(self, packages, players=None):
+        table = CheckTable("Registration packages")
+        table.equal("Packages shown", len(self.package_names(packages)), self.confirm.package_count())
+        for package in packages or []:
+            name = package["package_name"] if isinstance(package, dict) else str(package)
+            self.confirm.scroll_to_package(name)
+            table.contains(f"{name} - package", name, self.confirm.package_text(name))
+            if isinstance(package, dict) and package.get("package_slots"):
+                table.contains(f"{name} - slots", package["package_slots"], self.confirm.package_text(name))
+            if isinstance(package, dict) and package.get("package_players") is not None:
+                table.equal(f"{name} - players assigned", package["package_players"],
+                            self.confirm.package_player_count(name))
+        table.verify()
+
+    def verify_multi_price_players(self, packages, players=None):
+        table = CheckTable("Players per package")
+        for package in packages or []:
+            name = package["package_name"] if isinstance(package, dict) else str(package)
+            self.confirm.scroll_to_package(name)
+            assigned = self.confirm.package_player_items(name)
+            for player in self.player_names(package.get("players") if isinstance(package, dict) else None):
+                table.add(f"{name} - {player}", "in the package",
+                          "in the package" if any(player in text for text in assigned) else "not found",
+                          any(player in text for text in assigned))
+            if isinstance(package, dict) and package.get("package_full") is not None:
+                full = not self.confirm.has_add_player_in_package(name)
+                table.add(f"{name} - slots filled", bool(package["package_full"]), full,
+                          full == bool(package["package_full"]))
+        table.verify()
+
+    def verify_multi_price_registration(self, event_name, date, starting_time, venue, players,
+                                        packages=(), total_price="", registration_type="Standard registration"):
+        self.confirm.verify_screen()
+        table = CheckTable("Registration confirmation")
+        table.contains("Event name", event_name, self.confirm.event_title_text(event_name))
+        table.contains("Date", date, self.confirm.date_text())
+        table.contains("Starting time", starting_time, self.confirm.starting_time_text())
+        table.contains("Venue", venue, self.confirm.venue_text())
+        table.contains("Player", self.player_total(players), self.confirm.players_text())
+        if registration_type:
+            table.contains("Registration type", registration_type, self.confirm.registration_type_text())
+        if total_price:
+            table.amount("Total price", total_price, self.confirm.total_price_text())
+        table.verify()
+        self.verify_multi_price_packages(packages, players)
+
+    def verify_registration_success(self):
+        self.success.verify_screen()
 
     def verify_payment_success_event(self, date, starting_time, payment_information, players,
                                      venue="", payment_method=""):
@@ -256,7 +359,7 @@ class EventFlow(BaseFlow):
         assert starting_time in self.success.starting_time_text(), (
             f"starting time does not match: expected {starting_time}, "
             f"found {self.success.starting_time_text()}")
-        assert str(self.player_total(players)) in self.success.players_text(), (
+        assert str(self.player_total(players)) in self.success.players_text(), ( # type: ignore
             f"player count does not match: expected {self.player_total(players)}, "
             f"found {self.success.players_text()}")
         assert amounts.to_number(payment_information["total_payment"]) == amounts.to_number(
@@ -264,10 +367,10 @@ class EventFlow(BaseFlow):
             f"total does not match: expected {payment_information['total_payment']}, "
             f"found {self.success.total_text()}")
         if venue:
-            assert venue in self.success.venue_text(), (
+            assert venue in self.success.venue_text(), ( # type: ignore
                 f"venue does not match: expected {venue}, found {self.success.venue_text()}")
         if payment_method:
-            assert payment_method in self.success.payment_method_text(), (
+            assert payment_method in self.success.payment_method_text(), ( # type: ignore
                 f"payment method does not match: expected {payment_method}, "
                 f"found {self.success.payment_method_text()}")
 
@@ -283,36 +386,8 @@ class EventFlow(BaseFlow):
             f"starting time does not match: expected {starting_time}, "
             f"found {self.registration.starting_time_text()}")
         if venue:
-            assert venue in self.registration.venue_text(), (
+            assert venue in self.registration.venue_text(), ( # type: ignore
                 f"venue does not match: expected {venue}, found {self.registration.venue_text()}")
         if status:
             assert self.registration.has_status(status), (
                 f"registration status {status} not shown")
-
-    def verify_registration_confirmation(self):
-        self.confirm.verify_screen()
-
-    def pay_now(self):
-        self.confirm.tap_pay_now()
-
-    def proceed_to_pay(self):
-        self.gateway.verify_screen()
-        self.gateway.tap_proceed_to_pay()
-
-    def verify_registration_success(self):
-        self.success.verify_screen()
-
-    def finish(self):
-        self.success.tap_finish()
-
-    def open_registration_details(self):
-        self.success.open_registration_details()
-        self.registration.verify_screen()
-
-    def open_complete_breakdown(self):
-        self.registration.open_breakdown()
-        self.summary.verify_screen()
-
-    def back_to_registration_details(self):
-        self.summary.tap_back()
-        self.registration.verify_screen()
