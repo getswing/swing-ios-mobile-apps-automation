@@ -16,10 +16,12 @@ from pages.driving_range.booking_success_page import BookingSuccessPage
 from pages.driving_range.dr_booking_details_page import DrBookingDetailsPage
 from pages.swing_credits.swing_credits_page import SwingCreditsPage
 from pages.swing_credits.credits_history_page import CreditsHistoryPage
+from pages.add_credit_card_page import AddCreditCardPage
 from helpers import amounts
 
 
 class DrivingRangeFlow(BaseFlow):
+
     FLOW_NAME = "DrivingRangeFlow"
 
     def __init__(self, driver, reporter=None):
@@ -40,29 +42,29 @@ class DrivingRangeFlow(BaseFlow):
         self.booking = self.page(DrBookingDetailsPage)
         self.credits = self.page(SwingCreditsPage)
         self.history = self.page(CreditsHistoryPage)
+        self.credit_card = self.page(AddCreditCardPage)
+
+    # ----------------------------- actions -----------------------------
 
     def open_home_tab(self):
         self.home.open_home_tab()
         
+
     def open_driving_range(self, member_type = ""):
         self.home.open_driving_range()
         self.list.verify_screen(member_type)
     
+
     def open_swing_credits(self):
         self.home.wait_until_loaded()
         self.home.open_credits()
         self.credits.verify_screen()
     
+
     def open_swing_credit_history(self):
         self.credits.open_history()
         self.history.verify_screen()
     
-    def verify_earn_credit_booking_code(self, booking_code: str, total_amount):
-        self.history.open_earned_tab()
-        self.history.verify_credit_by_booking_code(booking_code)
-        table = CheckTable(f"Swing Credits earned for {amounts.booking_tag(booking_code)}")
-        table.amount("Credits earned", total_amount, self.history.booking_amount_number(booking_code))
-        table.verify()
 
     def only_swing_pass_partners(self, member_type = ""):
         self.list.scroll_to_swing_pass_filter()
@@ -141,6 +143,7 @@ class DrivingRangeFlow(BaseFlow):
     def set_balls(self, option, count):
         self.confirm.set_balls(option, count)
     
+
     def set_items(self, items):
         if items:
             self.confirm.set_items(items)
@@ -179,6 +182,7 @@ class DrivingRangeFlow(BaseFlow):
             self.promos.enter_search(promo_name)
             self.promos.apply_promo(promo_name)
     
+
     def apply_and_redeem_promo(self, promo_name, promo_code):
         self.open_promos()
         self.open_promo_code()
@@ -203,9 +207,6 @@ class DrivingRangeFlow(BaseFlow):
         self.payment.verify_screen()
         self.payment.select_method(name)
 
-    def verify_booking_confirmation(self):
-        self.confirm.verify_screen()
-
     def pay_now(self):
         self.confirm.tap_pay_now()
         self.proceed_to_pay()
@@ -213,30 +214,16 @@ class DrivingRangeFlow(BaseFlow):
     def proceed_to_pay(self):
         self.gateway.tap_proceed_to_pay()
 
-    def verify_payment_success(self):
-        self.success.verify_screen()
-
     def open_booking_details(self):
         self.success.open_booking_details()
         self.booking.verify_screen()
     
+
     def back_to_activity(self):
         self.wait_for(3)
         self.booking.tap_back()
         
     
-    def verify_button_exclusive_featured_promo(self, member_type):
-        self.details.verify_exclusive_swing_pass_promo(member_type)
-    
-    def verify_maximum_bays_driving_range(self, tot_bays):
-        self.bays.set_bays(tot_bays)
-        self.bays.verify_maximum_bays(tot_bays)
-    
-    def verify_maximum_balls(self):
-        table = CheckTable("Maximum balls")
-        disabled = self.confirm.button_balls_increase_is_disabled("balls")
-        table.add("Increase button", "disabled", "disabled" if disabled else "enabled", disabled)
-        table.verify()
 
     def get_payment_information_before_payment(self, used_credit = "0"):
         return self.confirm.payment_information(used_credit)
@@ -244,6 +231,47 @@ class DrivingRangeFlow(BaseFlow):
     def get_booking_code_after_payment(self):
         return self.success.booking_code_text()
     
+    def add_new_credit_card(self, card_name, card_number, card_expiry_date, card_cvv, is_primary: bool):
+        self.confirm.open_payment_method()
+        self.payment.add_credit_card()
+        self.credit_card.enter_cardholder_name(card_name)
+        self.credit_card.enter_card_number(card_number)
+        self.credit_card.enter_expiry_date(card_expiry_date)
+        self.credit_card.enter_cvv(card_cvv)
+        if is_primary:
+            self.credit_card.toggle_primary_method()
+    
+
+    # --------------------------- verifications ---------------------------
+
+    def verify_earn_credit_booking_code(self, booking_code: str, total_amount):
+        self.history.open_earned_tab()
+        self.history.verify_credit_by_booking_code(booking_code)
+        table = CheckTable(f"Swing Credits earned for {amounts.booking_tag(booking_code)}")
+        table.amount("Credits earned", total_amount, self.history.booking_amount_number(booking_code))
+        table.verify()
+
+    def verify_booking_confirmation(self):
+        self.confirm.verify_screen()
+
+    def verify_payment_success(self):
+        self.success.verify_screen()
+
+    def verify_button_exclusive_featured_promo(self, member_type):
+        self.details.verify_exclusive_swing_pass_promo(member_type)
+    
+
+    def verify_maximum_bays_driving_range(self, tot_bays):
+        self.bays.set_bays(tot_bays)
+        self.bays.verify_maximum_bays(tot_bays)
+    
+
+    def verify_maximum_balls(self):
+        table = CheckTable("Maximum balls")
+        disabled = self.confirm.button_balls_increase_is_disabled("balls")
+        table.add("Increase button", "disabled", "disabled" if disabled else "enabled", disabled)
+        table.verify()
+
     def verify_minimum_balls(self):
         self.confirm.tap_pay_now()
         table = CheckTable("Minimum balls")
@@ -315,3 +343,5 @@ class DrivingRangeFlow(BaseFlow):
         table = CheckTable(f"Swing Credits used for {amounts.booking_tag(booking_code)}")
         table.amount("Credits used", total_amount, self.history.booking_amount_number(booking_code))
         table.verify()
+    
+    

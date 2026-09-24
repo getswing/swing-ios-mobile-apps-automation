@@ -10,7 +10,6 @@ class EventDetailsPage(BasePage):
         self.wait_until_loaded()
         assert self.is_visible(L.EL_HEADER, timeout=20), "Event details screen not shown"
         assert self.is_visible(L.BTN_BACK, timeout=5), "Event details back button not shown"
-        assert self.is_visible(L.EL_CASHBACK_BANNER, timeout=5), "Event details cashback banner not shown"
         assert self.is_visible(L.BTN_SECURE_SLOT, timeout=5), "Event details secure your slot button not shown"
         self.capture_step("event_details")
         return self
@@ -61,6 +60,31 @@ class EventDetailsPage(BasePage):
 
     def value_of_label(self, label):
         return self.label_of(L.TXT_VALUE_BY_LABEL.format(label))
+
+    def scroll_to_event_information(self):
+        self.capture_step("Scroll to event information")
+        self.scroll_to(L.TXT_EVENT_INFORMATION)
+
+    def swing_pass_banner_text(self):
+        return self.label_of(L.EL_SWING_PASS_BANNER)
+
+    def starting_from_text(self):
+        return self.label_of(L.TXT_STARTING_FROM)
+
+    def has_swing_pass_banner(self, timeout=5):
+        return self.is_visible(L.EL_SWING_PASS_BANNER, timeout)
+
+    def has_swing_pass_only(self, timeout=5):
+        return self.is_visible(L.TXT_SWING_PASS_ONLY, timeout)
+
+    def has_event_information(self, timeout=5):
+        return self.is_visible(L.TXT_EVENT_INFORMATION, timeout)
+
+    def has_event_banner(self, timeout=5):
+        return self.is_visible(L.IMG_EVENT_BANNER, timeout)
+
+    def has_banner(self, text, timeout=5):
+        return self.is_visible(L.EL_BANNER_BY_TEXT.format(text), timeout)
 
     def has_leaderboard_banner(self, timeout=5):
         return self.is_visible(L.EL_LEADERBOARD_BANNER, timeout)

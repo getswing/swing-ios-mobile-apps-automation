@@ -34,6 +34,7 @@ HEADER_H = 34
 FOOTER_H = 20
 TOC_PER_PAGE = 20
 IMAGE_MAX_H = 190
+TABLE_IMAGE_H = 100
 IMAGE_MAX_W = 150
 
 
@@ -302,12 +303,27 @@ class PdfReport:
 
     def _table_block(self, pdf, entry, index):
         rows = str(entry.get("table") or "").splitlines()
-        if pdf.get_y() + len(rows) * 4.6 + 20 > pdf.h - FOOTER_H - 6:
+        shot = entry.get("screenshot")
+        size = _image_size(shot) if shot and Path(shot).exists() else None
+        image_h = image_w = 0
+        if size:
+            width, height = size
+            image_h = min(TABLE_IMAGE_H, IMAGE_MAX_W * height / width)
+            image_w = image_h * width / height
+        if pdf.get_y() + image_h + len(rows) * 4.6 + 22 > pdf.h - FOOTER_H - 6:
             pdf.add_page()
         pdf.start_section(_safe(entry["text"]))
         pdf.set_font("helvetica", "", 11)
         pdf.set_text_color(*INK)
         pdf.cell(0, 8, _safe(f"{index}. {entry['text']}"), new_x="LMARGIN", new_y="NEXT")
+        if image_h:
+            try:
+                pdf.image(shot, x=(pdf.w - image_w) / 2, h=image_h)
+            except Exception as exc:
+                pdf.set_font("helvetica", "I", 8)
+                pdf.multi_cell(0, 5, _safe(f"screenshot not embedded: {exc}"),
+                               new_x="LMARGIN", new_y="NEXT")
+            pdf.ln(3)
         pdf.set_font("courier", "", 8)
         for row in rows:
             pdf.set_text_color(*(FAIL_COLOR if row.endswith("FAIL") else INK))

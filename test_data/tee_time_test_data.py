@@ -3,7 +3,8 @@ from helpers.exceldata import ExcelData
 
 class TeeTimeTestData(ExcelData):
     SHEET = "Tee Time"
-    ALIASES = {"VERIFICATION_METHOD": "METHOD_VERIFICATION", "GOLF_COURSE": "VENUE"}
+    ALIASES = {"VERIFICATION_METHOD": "METHOD_VERIFICATION", "GOLF_COURSE": "VENUE",
+               "PLAYER_VERIFICATION_METHOD": "PLAYER_METHOD_VERIFICATION"}
 
     COUNTRY_NAME = "Indonesia"
     PHONE_NUMBER = "82165162549"
@@ -32,5 +33,8 @@ class TeeTimeTestData(ExcelData):
     PLAYER_FIRST_NAME = ""
     PLAYER_LAST_NAME = ""
     PLAYER_PHONE_NUMBER = ""
+    PLAYER_COUNTRY_NAME = "Indonesia"
+    PLAYER_METHOD_VERIFICATION = "whatsapp"
+    PLAYER_OTP = ""
     
     SPORT_TYPE = "Golf"

@@ -2,10 +2,13 @@ import pytest
 
 from flows.driving_range_flow import DrivingRangeFlow
 from flows.event_flow import EventFlow
+from flows.event_package_flow import EventPackageFlow
+from flows.group_booking_flow import GroupBookingFlow
 from flows.tee_time_flow import TeeTimeFlow
 from flows.home_flow import HomeFlow
 from flows.login_flow import LoginFlow
 from flows.onboarding_flow import OnboardingFlow
+from flows.player_details_flow import PlayerDetailsFlow
 from flows.swing_credit_flow import SwingCreditFlow
 from flows.reschedule_flow import RescheduleFlow
 from flows.cancellation_flow import CancellationFlow
@@ -54,3 +57,33 @@ def reschedule_flow(driver) -> RescheduleFlow:
 @pytest.fixture
 def cancellation_flow(driver) -> CancellationFlow:
     return CancellationFlow(driver)
+
+
+@pytest.fixture
+def player_details_flow(driver) -> PlayerDetailsFlow:
+    return PlayerDetailsFlow(driver)
+
+
+@pytest.fixture
+def event_package_flow(driver) -> EventPackageFlow:
+    return EventPackageFlow(driver)
+
+
+@pytest.fixture
+def player_login_flow(player_driver) -> LoginFlow:
+    return LoginFlow(player_driver)
+
+
+@pytest.fixture
+def player_home_flow(player_driver) -> HomeFlow:
+    return HomeFlow(player_driver)
+
+
+@pytest.fixture
+def host_group_flow(driver) -> GroupBookingFlow:
+    return GroupBookingFlow(driver)
+
+
+@pytest.fixture
+def player_group_flow(player_driver) -> GroupBookingFlow:
+    return GroupBookingFlow(player_driver)

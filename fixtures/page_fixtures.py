@@ -23,6 +23,7 @@ from pages.driving_range.payment_method_page import PaymentMethodPage
 from pages.onboarding.birthday_picker_page import BirthdayPickerPage
 from pages.event.add_player_page import EventAddPlayerPage
 from pages.event.event_details_page import EventDetailsPage
+from pages.event.select_package_page import SelectPackagePage
 from pages.event.event_list_page import EventListPage
 from pages.event.group_registration_info_page import GroupRegistrationInfoPage
 from pages.event.player_details_page import PlayerDetailsPage
@@ -55,6 +56,10 @@ from pages.onboarding.gender_picker_page import GenderPickerPage
 from pages.onboarding.nationality_picker_page import NationalityPickerPage
 from pages.confirm_reschedule_dialog_page import ConfirmRescheduleDialogPage
 from pages.confirm_reschedule_page import ConfirmReschedulePage
+from pages.add_credit_card_page import AddCreditCardPage
+from pages.confirm_credit_card_page import ConfirmCreditCardPage
+from pages.purchase_authentication_page import PurchaseAuthenticationPage
+from pages.card_linked_success_page import CardLinkedSuccessPage
 from pages.country_picker_page import CountryPickerPage
 from pages.homepage.home_page import HomePage
 from pages.homepage.location_permission_page import LocationPermissionPage
@@ -83,6 +88,11 @@ def login_page(driver) -> LoginPage:
 @pytest.fixture
 def country_picker_page(driver) -> CountryPickerPage:
     return CountryPickerPage(driver)
+
+
+@pytest.fixture
+def add_credit_card_page(driver):
+    return AddCreditCardPage(driver)
 
 
 @pytest.fixture
@@ -386,6 +396,11 @@ def event_details_page(driver) -> EventDetailsPage:
 
 
 @pytest.fixture
+def select_package_page(driver):
+    return SelectPackagePage(driver)
+
+
+@pytest.fixture
 def registration_method_page(driver) -> RegistrationMethodPage:
     return RegistrationMethodPage(driver)
 
@@ -438,3 +453,18 @@ def cancel_booking_dialog_page(driver) -> CancelBookingDialogPage:
 @pytest.fixture
 def cancellation_success_page(driver) -> CancellationSuccessPage:
     return CancellationSuccessPage(driver)
+
+
+@pytest.fixture
+def purchase_authentication_page(driver) -> PurchaseAuthenticationPage:
+    return PurchaseAuthenticationPage(driver)
+
+
+@pytest.fixture
+def card_linked_success_page(driver) -> CardLinkedSuccessPage:
+    return CardLinkedSuccessPage(driver)
+
+
+@pytest.fixture
+def confirm_credit_card_page(driver) -> ConfirmCreditCardPage:
+    return ConfirmCreditCardPage(driver)
