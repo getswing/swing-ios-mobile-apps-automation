@@ -2,6 +2,8 @@ from helpers.exceldata import find_rows
 
 SHEET = "Players"
 
+SHETT_EVENT = "Players Event"
+
 
 def load_players(tc_id):
     players = []
@@ -23,5 +25,21 @@ def load_players(tc_id):
             "promo_code": str(row.get("PROMO_CODE") or ""),
             "add_ons_name": str(row.get("ADD_ONS_NAME") or ""),
             "add_ons_qty": int(row.get("ADD_ONS_QTY") or 1),
+        })
+    return sorted(players, key=lambda player: player["player_no"])
+
+def load_players_event(tc_id):
+    players = []
+    for row in find_rows(SHETT_EVENT, "TC_ID", tc_id):
+        label = row.get("PLAYER_NAME")
+        if label in (None, ""):
+            continue
+        players.append({
+            "package_type": str(row.get("PACKAGE_TYPE") or ""),
+            "player_name": str(row.get("PLAYER_NAME") or ""),
+            "promo_name": str(row.get("PROMO_NAME") or ""),
+            "promo_code": str(row.get("PROMO_CODE") or ""),
+            "player_details": str(row.get("PLAYER_DETAILS") or "") 
+            
         })
     return sorted(players, key=lambda player: player["player_no"])

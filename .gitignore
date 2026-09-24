@@ -9,3 +9,5 @@ artifacts/*
 reports
 
 .DS_Store
+*.md
+.rtk

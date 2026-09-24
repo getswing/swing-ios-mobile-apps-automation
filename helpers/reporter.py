@@ -167,7 +167,7 @@ class Reporter:
         return self.add(f"{verb} {describe(locator)}", kind="read", value=value)
 
     def table(self, title, text):
-        entry = self.add(title, kind="table", evidence=True)
+        entry = self.add(title, kind="table", screenshot=self.capture(title), evidence=True)
         if entry is not None:
             entry["table"] = text
         return entry

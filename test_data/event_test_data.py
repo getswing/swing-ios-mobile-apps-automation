@@ -29,3 +29,5 @@ class EventTestData(ExcelData):
     PAYMENT_METHOD = "DANA"
     
     TC_NAME = ""
+    
+    TOTAL_PRICE = ""

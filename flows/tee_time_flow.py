@@ -360,14 +360,14 @@ class TeeTimeFlow(BaseFlow):
         for player in self.players_to_invite(players, total_players):
             self.invite_player(player)
             self.verify_player_added(player["player"])
-            self.verify_promo_autoapplied(player.get("player_label"), player.get("promo_name"))
+            self.verify_promo_autoapplied(player["player"], player["promo_name"])
     
     def invite_players_and_redeemed_promos(self, players, total_players=""):
         for player in self.players_to_invite(players, total_players):
             self.invite_player(player)
             self.verify_player_added(player["player"])
-            self.redeem_player_promo(player.get("player_label"), player.get("promo_name"), player.get("promo_code"))
-            self.verify_promo_applied(player.get("player_label"), player.get("promo_name"))
+            self.redeem_player_promo(player["player"], player["promo_name"], player["promo_code"])
+            self.verify_promo_applied(player["player"], player["promo_name"])
 
     def verify_booking_information(self, date, session, preferred_time, booking_type, players):
         

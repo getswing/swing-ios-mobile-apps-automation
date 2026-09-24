@@ -1,0 +1,11 @@
+class ConfirmCreditCardLocators:
+    TXT_TITLE = '//XCUIElementTypeStaticText[@name="Confirm your credit card"]'
+    BTN_BACK = '//XCUIElementTypeStaticText[@name="Confirm your credit card"]/preceding-sibling::XCUIElementTypeButton[1]'
+    TXT_SECURITY_NOTE = '//XCUIElementTypeStaticText[starts-with(@name,"For security and authentication")]'
+    TXT_CVV_LABEL = '//XCUIElementTypeStaticText[@name="CVV"]'
+    EL_CVV_FIELD = '//XCUIElementTypeStaticText[@name="CVV"]/following-sibling::XCUIElementTypeOther[1]'
+    INPUT_CVV = '//XCUIElementTypeStaticText[@name="CVV"]/following-sibling::XCUIElementTypeOther[1]/XCUIElementTypeTextField[1]'
+    INPUT_CVV_BY_CARD = '//XCUIElementTypeTextField[@name="Enter CVV for {}"]'
+    BTN_CVV_INFO = '//XCUIElementTypeStaticText[@name="CVV"]/following-sibling::XCUIElementTypeOther[1]/XCUIElementTypeButton[1]'
+    BTN_CONFIRM = '//XCUIElementTypeButton[@name="Confirm"]'
+    TXT_SCRIM = '//XCUIElementTypeStaticText[@name="Scrim"]'

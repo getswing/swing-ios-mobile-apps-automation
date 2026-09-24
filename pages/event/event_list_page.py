@@ -36,7 +36,7 @@ class EventListPage(BasePage):
 
     def scroll_to_card(self, text):
         self.capture_step("scroll_to_card")
-        self.scroll_to(L.EL_CARD_BY_TEXT.format(text))
+        self.scroll_to(L.EL_CARD_BY_TEXT.format(text), max_swipes=20)
 
     def tap_back(self):
         self.capture_step("tap_back")

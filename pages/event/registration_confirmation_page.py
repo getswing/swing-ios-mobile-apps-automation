@@ -1,4 +1,5 @@
 from locators.event.registration_confirmation_locators import RegistrationConfirmationLocators as L
+from helpers import amounts
 from pages.base_page import BasePage
 
 
@@ -41,6 +42,9 @@ class RegistrationConfirmationPage(BasePage):
     def remove_player(self, player):
         self.capture_step("remove_player")
         self.click(L.IMG_REMOVE_PLAYER_BY_NAME.format(player))
+    
+    def remove_player_without_name(self):
+        self.click(L.BUTTON_REMOVE_PLAYER)
 
     def enter_note(self, text):
         self.capture_step("enter_note")
@@ -120,6 +124,54 @@ class RegistrationConfirmationPage(BasePage):
 
     def unassigned_slot_count(self):
         return self.count(L.LIST_UNASSIGNED_SLOTS)
+
+    def event_title_text(self, name):
+        return self.label_of(L.TXT_EVENT_NAME_STARTS.format(name))
+
+    def scroll_to_package(self, name):
+        self.capture_step("Scroll to package", name)
+        self.scroll_to(L.EL_PACKAGE_BY_NAME.format(name))
+
+    def add_player_to_package(self, name):
+        self.capture_step("Add a player", name)
+        self.click(L.BTN_ADD_PLAYER_BY_PACKAGE.format(name))
+
+    def toggle_player_swing_credits(self, player):
+        self.capture_step("Use swing credits", player)
+        self.click(L.SWITCH_USE_CREDITS_BY_PLAYER.format(player))
+
+    def package_text(self, name):
+        return self.label_of(L.EL_PACKAGE_BY_NAME.format(name))
+
+    def package_items(self):
+        return self.texts_of(L.LIST_PACKAGES)
+
+    def package_count(self):
+        return self.count(L.LIST_PACKAGES)
+
+    def package_player_count(self, name):
+        return self.count(L.LIST_PLAYERS_BY_PACKAGE.format(name))
+
+    def package_player_items(self, name):
+        return self.texts_of(L.LIST_PLAYERS_BY_PACKAGE.format(name))
+
+    def total_price_text(self):
+        return self.label_of(L.EL_TOTAL_PRICE)
+
+    def player_price_text(self, player):
+        return amounts.amount_text(self.player_text(player))
+
+    def player_credits_text(self, player):
+        return self.label_of(L.SWITCH_USE_CREDITS_BY_PLAYER.format(player))
+
+    def has_package(self, name, timeout=5):
+        return self.is_visible(L.EL_PACKAGE_BY_NAME.format(name), timeout)
+
+    def has_add_player_in_package(self, name, timeout=5):
+        return self.is_visible(L.BTN_ADD_PLAYER_BY_PACKAGE.format(name), timeout)
+
+    def has_player_credits(self, player, timeout=5):
+        return self.is_visible(L.SWITCH_USE_CREDITS_BY_PLAYER.format(player), timeout)
 
     def has_player(self, player, timeout=5):
         return self.is_visible(L.IMG_PLAYER_BY_NAME.format(player), timeout)
